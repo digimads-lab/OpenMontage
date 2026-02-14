@@ -6,7 +6,7 @@
 
 **Open-source collaborative filmmaking**
 
-OpenMontage is a GitHub-inspired platform for creating videos through community collaboration. Just as developers contribute code to open-source projects, creators can contribute video segments to collaborative films.
+OpenMontage is a platform for creating videos through community collaboration, inspired by the open-source movement. Just as developers contribute code to open-source projects, creators can contribute video segments to collaborative films.
 
 ## Vision
 
@@ -19,6 +19,10 @@ In the age of AI, anyone can create video segments and blend them seamlessly wit
 3. **Voting & Selection** — The community votes on different versions of each segment
 4. **Automated Assembly** — The highest-rated segments are combined into a complete film
 5. **Iterative Improvement** — As more contributors join, the final video evolves and improves over time
+
+## Learn More
+
+For a detailed explanation of the platform architecture, workflow, and technical design, see our **[Whitepaper](doc/whitepaper.md)**.
 
 ## Contributing
 

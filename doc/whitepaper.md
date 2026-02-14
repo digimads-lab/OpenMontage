@@ -116,28 +116,33 @@ Each film is organized as a **project repository**:
 
 ### 3.2 Contribution Process
 
-1. **Browse open segments** needing submissions
-2. **Create a video** following segment requirements
-3. **Submit** via pull request or platform upload
-4. **Metadata validation**: Format, duration, and asset consistency checks
+Contributors can provide:
+
+**Video Segments**
+1. Browse segments needing submissions
+2. Create a video following segment requirements (AI generation, filming, animation, etc.)
+3. Submit via pull request or platform upload
+
+**Assets**
+- Characters (visual references, descriptions)
+- Props (3D models, reference images)
+- Locations (environment descriptions, reference images)
+- Audio (music, sound effects)
 
 ### 3.3 Voting & Selection
 
-1. Submissions enter a **review period**
-2. **Community votes** on quality dimensions:
-   - Visual quality
-   - Acting/performance
-   - Consistency with script
-   - Asset adherence (character likeness, location match)
-3. **Highest-rated submission** is selected for assembly
-4. Ratings decay over time to allow new submissions to compete
+1. **Lightweight voting**: Users directly vote on submissions via `votes.json`
+2. **Real-time ranking**: Highest-rated submission becomes the active version for each segment
+3. **Dynamic selection**: As votes change, the "current best" may shift over time
 
-### 3.4 Assembly & Release
+### 3.4 Dynamic Playback
 
-1. **Automated assembly**: Selected segments are stitched together
-2. **Transitions & polish**: Optional post-processing (fade, color grading)
-3. **Versioned release**: `v1.0`, `v1.1`, etc. as new segments are swapped in
-4. **Attribution**: End credits auto-generated from contributor metadata
+Instead of pre-assembling a complete video file:
+
+1. **Viewer app** reads `film.json` and current vote tallies
+2. **Real-time assembly**: App streams the highest-rated segment for each part in sequence
+3. **Live updates**: As votes change, the next playback reflects new selections
+4. **Attribution overlay**: Credits displayed dynamically during or after playback
 
 ---
 
@@ -147,21 +152,22 @@ Each film is organized as a **project repository**:
 
 - **Repository host**: Git-based storage (GitHub, GitLab, or custom)
 - **Metadata layer**: JSON schemas for all objects
-- **Voting system**: Transparent, timestamped vote records
-- **Assembly engine**: Automated video stitching pipeline
-- **Web interface**: Browse films, segments, and submissions
+- **Voting system**: Transparent, timestamped vote records in `votes.json`
+- **Playback app**: Dynamic player that assembles films in real-time based on current votes
+- **Web interface**: Browse films, segments, submissions, and assets
 
 ### 4.2 Storage & Delivery
 
-- **Submissions**: Cloud storage (S3-compatible) with CDN delivery
-- **Final films**: Distributed via IPFS or traditional streaming
-- **Metadata**: Stored in repository for version control
+- **Video submissions**: Cloud storage (S3-compatible) with CDN delivery
+- **Assets**: Stored in repository or linked externally
+- **Metadata**: Stored in repository for version control and transparency
+- **Playback**: Dynamic streaming via app — no pre-rendered "final" file
 
 ### 4.3 Quality Control
 
-- **Automated checks**: Resolution, format, duration validation
-- **Plagiarism detection**: Hash-based duplicate detection
-- **Moderation**: Community flagging + admin review for inappropriate content
+- **Community moderation**: Voting serves as primary quality filter
+- **Hash-based deduplication**: Prevent identical submissions
+- **Flagging system**: Community can flag inappropriate or off-spec content
 
 ---
 
@@ -209,21 +215,24 @@ Each film is organized as a **project repository**:
 ## 8. Roadmap
 
 **Phase 1: MVP**
-- Basic repository structure
-- Manual voting
-- Simple concatenation assembly
+- Basic repository structure (segments, submissions, assets)
+- Simple voting via `votes.json`
+- Dynamic playback app (real-time segment selection)
 
-**Phase 2: Automation**
-- Automated assembly pipeline
-- Web interface for browsing/voting
+**Phase 2: Asset Library**
+- Character/prop/location repositories
+- AI-assisted consistency checking
+- Contributor asset submissions
 
-**Phase 3: Assets & Consistency**
-- Character/prop libraries
-- AI-assisted style matching
+**Phase 3: Enhanced Playback**
+- Smooth transitions between segments
+- Quality-adaptive streaming
+- Interactive viewer features (alternate version selection)
 
 **Phase 4: Decentralization**
-- IPFS storage
+- IPFS storage for submissions
 - Blockchain-based voting (optional)
+- Token incentives for contributors
 
 ---
 

@@ -166,28 +166,7 @@ Instead of pre-assembling a complete video file:
 
 ---
 
-## 5. Governance & Economics
-
-### 5.1 Licensing
-
-- Default: **Creative Commons BY-SA** (attribution, share-alike)
-- Per-film customization allowed
-- Contributors retain rights to their submissions
-
-### 5.2 Incentives (Future)
-
-- **Reputation system**: Badges for quality contributions
-- **Tokenization** (optional): Reward top contributors with tokens
-- **Monetization**: Revenue sharing if films are sold/licensed
-
-### 5.3 Moderation
-
-- **Community-driven**: Voting on submissions includes flagging
-- **Admin oversight**: Final say on disputes or malicious content
-
----
-
-## 6. Use Cases
+## 5. Use Cases
 
 - **Student films**: Collaborative projects across schools/countries
 - **Indie experiments**: Creative communities iterating on avant-garde scripts
@@ -196,127 +175,15 @@ Instead of pre-assembling a complete video file:
 
 ---
 
-## 7. Challenges & Mitigations
+## 6. Roadmap
 
-| Challenge | Mitigation |
-|-----------|-----------|
-| Inconsistent visual style | Asset library + style guides per film |
-| Low-quality submissions | Community voting + quality thresholds |
-| Copyright violations | Hash-based checks + DMCA process |
-| Coordination overhead | Clear segment specs + metadata standards |
+_(To be defined)_
 
 ---
 
-## 8. Roadmap
-
-**Phase 1: MVP**
-- Basic repository structure (segments, submissions, assets)
-- Simple voting via `votes.json`
-- Dynamic playback app (real-time segment selection)
-
-**Phase 2: Asset Library**
-- Character/prop/location repositories
-- AI-assisted consistency checking
-- Contributor asset submissions
-
-**Phase 3: Enhanced Playback**
-- Smooth transitions between segments
-- Quality-adaptive streaming
-- Interactive viewer features (alternate version selection)
-
-**Phase 4: Decentralization**
-- IPFS storage for submissions
-- Blockchain-based voting (optional)
-- Token incentives for contributors
-
----
-
-## 9. Conclusion
+## 7. Conclusion
 
 OpenMontage reimagines filmmaking as a collaborative, iterative process inspired by the open-source movement. By leveraging AI-enabled creation and community curation, it empowers anyone to contribute to high-quality films — turning scripts into movies through the collective effort of a global creative community.
-
----
-
-## Appendix A: Metadata Schema Examples
-
-### Film Manifest (`film.json`)
-```json
-{
-  "title": "The Last Horizon",
-  "genre": "Sci-Fi",
-  "synopsis": "A journey beyond known space...",
-  "targetRuntime": 120,
-  "license": "CC BY-SA 4.0",
-  "createdAt": "2026-02-14T00:00:00Z",
-  "segments": [
-    {
-      "id": "001",
-      "metadataPath": "segments/001-opening/segment.json"
-    },
-    {
-      "id": "002",
-      "metadataPath": "segments/002-introduction/segment.json"
-    }
-  ]
-}
-```
-
-### Segment Description (`segments/001-opening/segment.md`)
-```markdown
-# Segment 001: Opening
-
-**Script**: EXT. DESERT - DAY. A lone figure walks toward the horizon.
-
-**Duration**: 15-25 seconds
-
-**Requirements**:
-- Characters: Protagonist
-- Location: Desert landscape
-- Props: Backpack
-
-**Visual Notes**: Wide shot emphasizing isolation and vast empty landscape.
-```
-
-### Segment Metadata (`segments/001-opening/segment.json`)
-```json
-{
-  "id": "001",
-  "durationRange": [15, 25],
-  "requirements": {
-    "characters": ["protagonist"],
-    "location": "desert",
-    "props": ["backpack"]
-  },
-  "selectedSubmission": {
-    "contributor": "alice_creates",
-    "submissionPath": "submissions/contributor-a.json",
-    "videoHash": "sha256:a1b2c3d4...",
-    "videoUrl": "https://cdn.openmontage.org/videos/001-alice.mp4",
-    "resolution": "1920x1080",
-    "duration": 18
-  }
-}
-```
-
-### Submission Metadata (`segments/001-opening/submissions/contributor-a.json`)
-```json
-{
-  "segmentId": "001",
-  "contributor": "alice_creates",
-  "method": "Runway Gen-3",
-  "videoHash": "sha256:a1b2c3d4...",
-  "videoUrl": "https://cdn.openmontage.org/videos/001-alice.mp4",
-  "resolution": "1920x1080",
-  "format": "mp4",
-  "duration": 18,
-  "uploadedAt": "2026-02-14T08:00:00Z",
-  "ratings": {
-    "visual": 4.2,
-    "performance": 4.5,
-    "consistency": 4.8
-  }
-}
-```
 
 ---
 

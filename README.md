@@ -20,6 +20,10 @@ In the age of AI, anyone can create video segments and blend them seamlessly wit
 4. **Automated Assembly** — The highest-rated segments are combined into a complete film
 5. **Iterative Improvement** — As more contributors join, the final video evolves and improves over time
 
+## Learn More
+
+For a detailed explanation of the platform architecture, workflow, and technical design, see our **[Whitepaper](doc/whitepaper.md)**.
+
 ## Contributing
 
 We welcome contributions of all kinds — video segments, scripts, tooling, and ideas. See our documentation for more details.

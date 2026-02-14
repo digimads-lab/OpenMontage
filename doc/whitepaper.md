@@ -2,7 +2,7 @@
 
 ## Abstract
 
-OpenMontage is a decentralized, community-driven platform for collaborative filmmaking. Inspired by the open-source movement, it enables creators worldwide to contribute video segments, vote on quality, and collectively produce complete films through iterative improvement.
+OpenMontage is a decentralized, community-driven platform for collaborative filmmaking powered by AI. Inspired by the open-source movement, it enables anyone worldwide to contribute AI-generated video segments, vote on quality, and collectively produce complete films through iterative improvement. In the age of AI video generation, filmmaking becomes truly accessible to all.
 
 ---
 
@@ -10,15 +10,17 @@ OpenMontage is a decentralized, community-driven platform for collaborative film
 
 ### 1.1 Motivation
 
-In the age of AI-generated content, video creation is democratized. However, producing a complete, high-quality film still requires significant coordination, resources, and expertise. OpenMontage solves this by enabling:
+**AI has democratized video creation.** Tools like Runway, Sora, Pika, and others allow anyone to generate high-quality video from text prompts — no cameras, no studios, no film crew required.
 
-- **Distributed creation**: Anyone can contribute segments
-- **Quality curation**: Community voting ensures the best work rises to the top
-- **Iterative improvement**: Films evolve over time as better contributions arrive
+However, producing a complete, coherent film still requires coordination and curation. OpenMontage solves this by:
+
+- **Enabling mass AI-powered contribution**: Anyone can generate and submit video segments
+- **Community curation**: Voting ensures the best AI-generated work rises to the top
+- **Continuous evolution**: Films improve over time as contributors refine their AI prompts and techniques
 
 ### 1.2 Vision
 
-A future where any script can become a polished film through the collective creativity of a global community.
+A future where any script can become a polished film through the collective AI-powered creativity of a global community. Everyone is a potential filmmaker.
 
 ---
 
@@ -27,8 +29,9 @@ A future where any script can become a polished film through the collective crea
 ### 2.1 Roles
 
 **Contributors**
-- Create and submit video segments
-- May use AI tools, traditional filming, animation, etc.
+- Generate and submit video segments using AI tools (Runway, Sora, Pika, etc.)
+- Anyone can participate — no technical filmmaking skills required
+- Traditional filming and animation are also welcome
 - Retain attribution for their work
 
 **Voters**
@@ -118,10 +121,13 @@ Each film is organized as a **project repository**:
 
 Contributors can provide:
 
-**Video Segments**
+**Video Segments (AI-Generated)**
 1. Browse segments needing submissions
-2. Create a video following segment requirements (AI generation, filming, animation, etc.)
-3. Submit via pull request or platform upload
+2. Use AI tools (Runway, Sora, Pika, etc.) to generate video from the segment script
+3. Iterate on prompts to match segment requirements (characters, tone, visual style)
+4. Submit via pull request or platform upload
+
+Traditional filming and animation are also welcome, but AI generation is the primary focus.
 
 **Assets**
 - Characters (visual references, descriptions)
@@ -168,10 +174,11 @@ Instead of pre-assembling a complete video file:
 
 ## 5. Use Cases
 
-- **Student films**: Collaborative projects across schools/countries
-- **Indie experiments**: Creative communities iterating on avant-garde scripts
-- **Educational content**: Science explainers built segment-by-segment
-- **Fan films**: Community-driven adaptations of public domain works
+- **Student films**: Collaborative AI-generated projects across schools/countries — no budget required
+- **Indie experiments**: Creative communities iterating on avant-garde scripts with AI tools
+- **Educational content**: Science explainers built segment-by-segment by educators using AI video generation
+- **Fan films**: Community-driven AI adaptations of public domain works
+- **Rapid prototyping**: Filmmakers can visualize scripts quickly before committing to traditional production
 
 ---
 
@@ -183,7 +190,7 @@ _(To be defined)_
 
 ## 7. Conclusion
 
-OpenMontage reimagines filmmaking as a collaborative, iterative process inspired by the open-source movement. By leveraging AI-enabled creation and community curation, it empowers anyone to contribute to high-quality films — turning scripts into movies through the collective effort of a global creative community.
+OpenMontage reimagines filmmaking as a collaborative, iterative process inspired by the open-source movement. By leveraging **AI video generation** and community curation, it empowers **anyone** to contribute to high-quality films — no equipment, no budget, no film school required. In the age of AI, everyone can be a filmmaker. Together, we turn scripts into movies through the collective AI-powered creativity of a global community.
 
 ---
 

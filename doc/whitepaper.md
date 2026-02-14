@@ -78,16 +78,19 @@ Each film is organized as a **project repository**:
 ├── README.md                 # Film overview
 ├── script.md                 # Full screenplay
 ├── segments/
-│   ├── 001-opening.json      # Segment metadata (selected version, video hash, URL)
-│   ├── 002-introduction.json
+│   ├── 001-opening/
+│   │   ├── segment.md        # Segment description (script, requirements)
+│   │   ├── segment.json      # Segment metadata (selected version, video hash, URL)
+│   │   └── submissions/
+│   │       ├── contributor-a.json  # Video hash, URL, ratings
+│   │       ├── contributor-b.json
+│   │       └── ...
+│   ├── 002-introduction/
+│   │   ├── segment.md
+│   │   ├── segment.json
+│   │   └── submissions/
+│   │       └── ...
 │   └── ...
-├── submissions/
-│   ├── 001/
-│   │   ├── contributor-a.json  # Video hash, URL, ratings
-│   │   ├── contributor-b.json
-│   │   └── ...
-│   └── 002/
-│       └── ...
 ├── assets/
 │   ├── characters/
 │   │   ├── protagonist.json
@@ -95,8 +98,6 @@ Each film is organized as a **project repository**:
 │   ├── props/
 │   ├── locations/
 │   └── audio/
-├── final/
-│   └── assembled-v1.0.json   # Assembly metadata with segment references
 └── votes.json                # Voting records
 ```
 
@@ -246,21 +247,36 @@ OpenMontage reimagines filmmaking as a collaborative, iterative process inspired
   "segments": [
     {
       "id": "001",
-      "metadataPath": "segments/001-opening.json"
+      "metadataPath": "segments/001-opening/segment.json"
     },
     {
       "id": "002",
-      "metadataPath": "segments/002-introduction.json"
+      "metadataPath": "segments/002-introduction/segment.json"
     }
   ]
 }
 ```
 
-### Segment Metadata (`segments/001-opening.json`)
+### Segment Description (`segments/001-opening/segment.md`)
+```markdown
+# Segment 001: Opening
+
+**Script**: EXT. DESERT - DAY. A lone figure walks toward the horizon.
+
+**Duration**: 15-25 seconds
+
+**Requirements**:
+- Characters: Protagonist
+- Location: Desert landscape
+- Props: Backpack
+
+**Visual Notes**: Wide shot emphasizing isolation and vast empty landscape.
+```
+
+### Segment Metadata (`segments/001-opening/segment.json`)
 ```json
 {
   "id": "001",
-  "script": "EXT. DESERT - DAY. A lone figure walks toward the horizon.",
   "durationRange": [15, 25],
   "requirements": {
     "characters": ["protagonist"],
@@ -269,6 +285,7 @@ OpenMontage reimagines filmmaking as a collaborative, iterative process inspired
   },
   "selectedSubmission": {
     "contributor": "alice_creates",
+    "submissionPath": "submissions/contributor-a.json",
     "videoHash": "sha256:a1b2c3d4...",
     "videoUrl": "https://cdn.openmontage.org/videos/001-alice.mp4",
     "resolution": "1920x1080",
@@ -277,7 +294,7 @@ OpenMontage reimagines filmmaking as a collaborative, iterative process inspired
 }
 ```
 
-### Submission Metadata (`submissions/001/contributor-a.json`)
+### Submission Metadata (`segments/001-opening/submissions/contributor-a.json`)
 ```json
 {
   "segmentId": "001",

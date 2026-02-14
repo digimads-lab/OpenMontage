@@ -18,7 +18,7 @@ OpenMontage is a GitHub-inspired platform for creating videos through community 
 
 ## Vision
 
-With enough contributors, even a simple script can become a polished, professional-looking film through the collective creativity of the community.
+In the age of AI, anyone can create video segments and blend them seamlessly with others' work. With enough contributors, even a simple script can become a polished, professional-looking film through the collective creativity of the community.
 
 ## Contributing
 

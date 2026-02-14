@@ -152,8 +152,10 @@ Instead of pre-assembling a complete video file:
 
 - **Repository host**: Git-based storage (GitHub, GitLab, or custom)
 - **Metadata layer**: JSON schemas for all objects
-- **Voting system**: Transparent, timestamped vote records in `votes.json`
-- **Playback app**: Dynamic player that assembles films in real-time based on current votes
+- **Viewer/Voting app**: Combined interface where users watch films, vote on segments, and browse submissions
+  - Real-time playback based on current vote tallies
+  - Integrated voting UI (viewers and voters are the same audience)
+  - Dynamic assembly engine that selects highest-rated segments
 - **Web interface**: Browse films, segments, submissions, and assets
 
 ### 4.2 Storage & Delivery
@@ -161,13 +163,6 @@ Instead of pre-assembling a complete video file:
 - **Video submissions**: Cloud storage (S3-compatible) with CDN delivery
 - **Assets**: Stored in repository or linked externally
 - **Metadata**: Stored in repository for version control and transparency
-- **Playback**: Dynamic streaming via app — no pre-rendered "final" file
-
-### 4.3 Quality Control
-
-- **Community moderation**: Voting serves as primary quality filter
-- **Hash-based deduplication**: Prevent identical submissions
-- **Flagging system**: Community can flag inappropriate or off-spec content
 
 ---
 

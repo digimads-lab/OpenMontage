@@ -36,8 +36,8 @@ A future where any script can become a polished film through the collective crea
 - Influence which versions make it into the final assembly
 - May overlap with contributors
 
-**Viewers (Audience)**
-- Watch the final assembled film for entertainment
+**Audience**
+- Watch the assembled film for entertainment
 - The ultimate consumers of the collaborative work
 - May provide feedback for future iterations
 
@@ -103,9 +103,81 @@ Each film is organized as a **project repository**:
 
 ---
 
-## 3. Workflow
+## 3. Technical Architecture
 
-### 3.1 Film Initialization
+### 3.1 Platform Components
+
+- **Repository host**: Git-based storage (GitHub, GitLab, or custom)
+- **Metadata layer**: JSON schemas for all objects
+- **Audience/Voting app**: Combined interface where users watch films, vote on segments, and browse submissions
+  - Real-time playback based on current vote tallies
+  - Integrated voting UI (audience and voters are the same)
+  - Dynamic assembly engine that selects highest-rated segments
+- **Web interface**: Browse films, segments, submissions, and assets
+
+### 3.2 Storage & Delivery
+
+- **Video submissions**: Cloud storage (S3-compatible) with CDN delivery
+- **Assets**: Stored in repository or linked externally
+- **Metadata**: Stored in repository for version control and transparency
+
+---
+
+## 4. Workflow
+
+```mermaid
+---
+title: OpenMontage Workflow
+---
+graph TD
+    subgraph "Film Creator"
+        A1[Upload Script]
+        A2[Break into Segments]
+        A3[Define Requirements]
+    end
+    
+    subgraph "Repository"
+        R1[film.json]
+        R2[segments/]
+        R3[assets/]
+        R4[votes.json]
+    end
+    
+    subgraph "Contributors"
+        C1[Browse Segments]
+        C2[Generate Video<br/>AI/Filming/Animation]
+        C3[Submit to Repo]
+    end
+    
+    subgraph "Voters"
+        V1[Watch Submissions]
+        V2[Vote on Quality]
+        V3[Update votes.json]
+    end
+    
+    subgraph "Audience"
+        AU1[Open Audience App]
+        AU2[Stream Film<br/>Top-voted Segments]
+        AU3[Watch & Enjoy]
+    end
+    
+    A1 --> A2 --> A3 --> R1
+    A3 --> R2
+    A3 --> R3
+    
+    R2 --> C1
+    C1 --> C2 --> C3 --> R2
+    
+    R2 --> V1
+    V1 --> V2 --> V3 --> R4
+    
+    R1 --> AU1
+    R4 --> AU1
+    R2 --> AU1
+    AU1 --> AU2 --> AU3
+```
+
+### 4.1 Film Initialization
 
 1. A **creator** uploads a script and breaks it into segments
 2. Each segment is defined with:
@@ -114,7 +186,7 @@ Each film is organized as a **project repository**:
    - Scene requirements (characters, props, location)
 3. Assets are documented for consistency
 
-### 3.2 Contribution Process
+### 4.2 Contribution Process
 
 Contributors can provide:
 
@@ -129,42 +201,24 @@ Contributors can provide:
 - Locations (environment descriptions, reference images)
 - Audio (music, sound effects)
 
-### 3.3 Voting & Selection
+### 4.3 Voting & Selection
 
 1. **Lightweight voting**: Users directly vote on submissions via `votes.json`
 2. **Real-time ranking**: Highest-rated submission becomes the active version for each segment
 3. **Dynamic selection**: As votes change, the "current best" may shift over time
 
-### 3.4 Dynamic Playback
+### 4.4 Dynamic Playback
 
 Instead of pre-assembling a complete video file:
 
-1. **Viewer app** reads `film.json` and current vote tallies
+1. **Audience app** reads `film.json` and current vote tallies
 2. **Real-time assembly**: App streams the highest-rated segment for each part in sequence
 3. **Live updates**: As votes change, the next playback reflects new selections
 4. **Attribution overlay**: Credits displayed dynamically during or after playback
 
 ---
 
-## 4. Technical Architecture
-
-### 4.1 Platform Components
-
-- **Repository host**: Git-based storage (GitHub, GitLab, or custom)
-- **Metadata layer**: JSON schemas for all objects
-- **Viewer/Voting app**: Combined interface where users watch films, vote on segments, and browse submissions
-  - Real-time playback based on current vote tallies
-  - Integrated voting UI (viewers and voters are the same audience)
-  - Dynamic assembly engine that selects highest-rated segments
-- **Web interface**: Browse films, segments, submissions, and assets
-
-### 4.2 Storage & Delivery
-
-- **Video submissions**: Cloud storage (S3-compatible) with CDN delivery
-- **Assets**: Stored in repository or linked externally
-- **Metadata**: Stored in repository for version control and transparency
-
----
+## 5. Use Cases
 
 ## 5. Use Cases
 

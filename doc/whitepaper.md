@@ -2,7 +2,7 @@
 
 ## Abstract
 
-OpenMontage is a decentralized, community-driven platform for collaborative filmmaking. Inspired by open-source software development, it enables creators worldwide to contribute video segments, vote on quality, and collectively produce complete films through iterative improvement.
+OpenMontage is a decentralized, community-driven platform for collaborative filmmaking. Inspired by the open-source movement, it enables creators worldwide to contribute video segments, vote on quality, and collectively produce complete films through iterative improvement.
 
 ---
 
@@ -36,8 +36,9 @@ A future where any script can become a polished film through the collective crea
 - Influence which versions make it into the final assembly
 - May overlap with contributors
 
-**Viewers**
-- Consume the final assembled film
+**Viewers (Audience)**
+- Watch the final assembled film for entertainment
+- The ultimate consumers of the collaborative work
 - May provide feedback for future iterations
 
 ### 2.2 Objects & Metadata
@@ -73,17 +74,18 @@ Each film is organized as a **project repository**:
 
 ```
 /my-film-project/
+├── film.json                 # Root manifest: segment list with metadata paths
 ├── README.md                 # Film overview
 ├── script.md                 # Full screenplay
 ├── segments/
-│   ├── 001-opening.md        # Segment definition
-│   ├── 002-introduction.md
+│   ├── 001-opening.json      # Segment metadata (selected version, video hash, URL)
+│   ├── 002-introduction.json
 │   └── ...
 ├── submissions/
 │   ├── 001/
-│   │   ├── contributor-a.mp4
-│   │   ├── contributor-b.mp4
-│   │   └── metadata.json     # Ratings, timestamps
+│   │   ├── contributor-a.json  # Video hash, URL, ratings
+│   │   ├── contributor-b.json
+│   │   └── ...
 │   └── 002/
 │       └── ...
 ├── assets/
@@ -94,7 +96,7 @@ Each film is organized as a **project repository**:
 │   ├── locations/
 │   └── audio/
 ├── final/
-│   └── assembled-v1.0.mp4    # Latest compiled film
+│   └── assembled-v1.0.json   # Assembly metadata with segment references
 └── votes.json                # Voting records
 ```
 
@@ -226,13 +228,13 @@ Each film is organized as a **project repository**:
 
 ## 9. Conclusion
 
-OpenMontage reimagines filmmaking as a collaborative, iterative process akin to open-source software development. By leveraging AI-enabled creation and community curation, it empowers anyone to contribute to high-quality films — turning scripts into movies through the collective effort of a global creative community.
+OpenMontage reimagines filmmaking as a collaborative, iterative process inspired by the open-source movement. By leveraging AI-enabled creation and community curation, it empowers anyone to contribute to high-quality films — turning scripts into movies through the collective effort of a global creative community.
 
 ---
 
 ## Appendix A: Metadata Schema Examples
 
-### Film Metadata (JSON)
+### Film Manifest (`film.json`)
 ```json
 {
   "title": "The Last Horizon",
@@ -240,12 +242,21 @@ OpenMontage reimagines filmmaking as a collaborative, iterative process akin to 
   "synopsis": "A journey beyond known space...",
   "targetRuntime": 120,
   "license": "CC BY-SA 4.0",
-  "segments": 42,
-  "createdAt": "2026-02-14T00:00:00Z"
+  "createdAt": "2026-02-14T00:00:00Z",
+  "segments": [
+    {
+      "id": "001",
+      "metadataPath": "segments/001-opening.json"
+    },
+    {
+      "id": "002",
+      "metadataPath": "segments/002-introduction.json"
+    }
+  ]
 }
 ```
 
-### Segment Metadata
+### Segment Metadata (`segments/001-opening.json`)
 ```json
 {
   "id": "001",
@@ -255,18 +266,28 @@ OpenMontage reimagines filmmaking as a collaborative, iterative process akin to 
     "characters": ["protagonist"],
     "location": "desert",
     "props": ["backpack"]
+  },
+  "selectedSubmission": {
+    "contributor": "alice_creates",
+    "videoHash": "sha256:a1b2c3d4...",
+    "videoUrl": "https://cdn.openmontage.org/videos/001-alice.mp4",
+    "resolution": "1920x1080",
+    "duration": 18
   }
 }
 ```
 
-### Submission Metadata
+### Submission Metadata (`submissions/001/contributor-a.json`)
 ```json
 {
   "segmentId": "001",
   "contributor": "alice_creates",
   "method": "Runway Gen-3",
+  "videoHash": "sha256:a1b2c3d4...",
+  "videoUrl": "https://cdn.openmontage.org/videos/001-alice.mp4",
   "resolution": "1920x1080",
   "format": "mp4",
+  "duration": 18,
   "uploadedAt": "2026-02-14T08:00:00Z",
   "ratings": {
     "visual": 4.2,

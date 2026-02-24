@@ -10,6 +10,17 @@ Think GitHub for films. Directors upload scripts, creators submit video segments
 
 ---
 
+## What's New
+
+**From:** Centralized capital + director dictatorship  
+**To:** Decentralized collaboration + merit-driven selection
+
+Films become open-source projects. Quality wins, not connections. Revenue flows to whoever's work is actually in the final cut.
+
+**Technical enabler:** Standard Library (dependency packages ensuring visual consistency across AI-generated segments)
+
+---
+
 ## How It Works
 
 1. **Director** uploads a script and breaks it into shots
@@ -19,17 +30,6 @@ Think GitHub for films. Directors upload scripts, creators submit video segments
 5. **Revenue** splits automatically: 80% to creators, 15% to director, 5% to voters
 
 Films evolve over time — better segments can replace old ones, shifting revenue to whoever's currently in the final cut.
-
----
-
-## The Key Shift
-
-**From:** Centralized capital + director dictatorship  
-**To:** Decentralized collaboration + merit-driven selection
-
-Films become open-source projects. Quality wins, not connections. Revenue flows to whoever's work is actually in the final cut.
-
-**Technical enabler:** Standard Library (dependency packages ensuring visual consistency across AI-generated segments)
 
 ---
 

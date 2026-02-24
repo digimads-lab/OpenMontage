@@ -4,168 +4,110 @@
   <img src="logo.jpg" alt="OpenMontage Logo" width="200"/>
 </p>
 
-**Git for Movies — Decentralized AI-Powered Collaborative Filmmaking**
+**Git for Movies**
 
-OpenMontage reimagines cinema production by applying version control principles to filmmaking. Just as developers collaborate on open-source software, creators worldwide can contribute video segments to evolving films — with blockchain-based ownership and revenue sharing.
-
----
-
-## 🎯 The Problem
-
-AI democratizes video creation, but collaborative AI filmmaking faces critical challenges:
-
-- **Visual inconsistency**: Different creators using AI tools (Sora, Runway) produce incompatible character appearances and art styles
-- **No incentive structure**: Computational costs and creative effort go unrewarded
-- **Centralized gatekeeping**: Traditional film production remains inaccessible to global talent
+OpenMontage lets anyone contribute to films like developers contribute to open-source projects. Upload a script, break it into shots, and watch the community create segments. The best work gets merged, creators earn based on screen time, and films evolve as better versions replace old ones.
 
 ---
 
-## 💡 Our Solution: The Standard Library + Crypto Economics
+## The Problem
 
-### 1. **Standard Library System**
-Every film includes mandatory dependency packages (like npm for movies):
-- **Character LoRA models** for consistent appearances
-- **Style guides** and prompt templates
-- **ControlNet specifications** for animation
-- **Voice clone models** for audio coherence
+AI tools can generate video now, but collaborative AI filmmaking doesn't work yet:
 
-**Result**: Anyone can generate segments that seamlessly integrate, solving the #1 barrier to crowdsourced AI video.
-
-### 2. **NFT-Based Ownership & Streaming Revenue**
-- Each segment is minted as a **Clip NFT** with proof of authorship
-- The complete film is a **Root NFT** pointing to merged segments
-- **80% of all revenue** flows to creators via per-second streaming payments
-- Segments can be replaced by better versions, shifting revenue to superior work
-
-**Result**: Meritocratic earnings model where creators earn as long as their work remains best-in-class.
+- **Everyone's protagonist looks different** — 10 creators, 10 different faces
+- **No reason to contribute** — video generation costs money and time
+- **Films stay frozen** — can't improve after release, even when AI gets better
 
 ---
 
-## 🎬 How It Works
+## How We Solve It
 
-### For Film Initiators
-1. Upload script and break into Scenes/Shots
-2. **Build Standard Library**: Train character LoRAs, define art style, create prompt templates
-3. Set up Treasury for automated revenue distribution
-4. Optionally crowdfund via Film Ticket NFTs
+### Standard Library
+Every film ships with dependencies (like npm, but for movies):
+- Character LoRA models → everyone's protagonist looks identical
+- Style guides → consistent lighting and color
+- Voice models → same voice across all segments
 
-### For Contributors
-1. Claim an available Shot from any film repository
-2. **Pull Standard Library dependencies** (LoRAs, style guides, ControlNets)
-3. Generate video segment using AI tools (Sora, Runway, etc.) + Standard Library
-4. Submit as Pull Request → minted as Clip NFT
+Pull the library, generate your segment, submit a PR. Simple.
 
-### For the Community
-1. Vote on submitted segments (stake tokens for influence)
-2. Best segment gets merged into Main Branch
-3. **Earn curation rewards** (5% of film revenue)
-
-### For Audiences
-1. Stream films with real-time assembly of highest-voted segments
-2. Watch movies that **evolve and improve** over time
-3. Support creators directly via pay-per-view, tips, or Film Ticket NFT purchases
+### Crypto Economics
+- Each segment = NFT with authorship proof
+- 80% of revenue flows to creators based on screen time
+- Better segment replaces yours? Revenue shifts to them
+- Keep competing, keep earning
 
 ---
 
-## 💰 Economic Model (Tokenomics)
+## Quick Start
 
-### Revenue Distribution (Smart Contract Automated)
+**For Filmmakers:**
+1. Upload script, split into shots
+2. Train character LoRAs, build your Standard Library
+3. Launch the repo, let creators work
 
-| Stakeholder | Share | Payment Model |
-|-------------|-------|---------------|
-| **Segment Creators** | 80% | Per-second streaming revenue while in Main Branch |
-| **Film Initiator + Standard Library** | 15% | Fixed royalty for foundational infrastructure |
-| **Curators & Voters** | 5% | Rewards for quality curation |
+**For Contributors:**
+1. Find a film, claim a shot
+2. Download the Standard Library
+3. Generate video (Sora, Runway, whatever)
+4. Submit → get minted as Clip NFT
 
-### Example Earnings
-A 30-second segment in a 90-minute film earning $10,000/month:
-- **Creator earns**: (30s / 5400s) × $8,000 = **$44.44/month** passive income
-- Earnings continue until segment is replaced by a better version
-
-**Iterative competition** drives continuous quality improvement as creators race to use latest AI models and techniques.
-
----
-
-## 📚 Documentation
-
-- **[Product Mechanism](doc/product-mechanism.md)** — Git for Movies concept, Standard Library system, Pull Request workflow
-- **[Tokenomics](doc/tokenomics.md)** — NFT ownership, revenue distribution, governance model
-- **[Whitepaper](doc/whitepaper.md)** — Technical architecture, repository structure, platform components
+**For Everyone:**
+Vote on segments. Best one wins. Earn 5% of revenue for curating.
 
 ---
 
-## 🚀 Key Innovations
+## Revenue Split
 
-### 1. Standard Library (Solves Consistency Problem)
-First platform to mandate dependency packages for AI-generated content, enabling visual/audio coherence across distributed contributors.
+| Who | Share | How |
+|-----|-------|-----|
+| Creators | 80% | Per-second streaming payment while segment is active |
+| Filmmaker | 15% | Built the foundation (script + Standard Library) |
+| Curators | 5% | Voted to select best segments |
 
-### 2. Streaming Revenue Model (Solves Incentive Problem)
-Creators earn proportional to screen time, not upfront fees. Revenue flows continuously while work remains active.
-
-### 3. Version Control for Films (Solves Quality Problem)
-Better segments can replace existing ones via community voting. Films improve over time as AI technology advances.
-
-### 4. Transparent On-Chain Economics (Solves Trust Problem)
-All ownership, voting, and payments tracked via smart contracts. No black-box studio accounting.
+**Example:** 30-second segment in a film earning $10k/month → **$44/month** passive income (until someone beats you).
 
 ---
 
-## 🎯 Use Cases
+## Why This Works
 
-- **Indie AI films**: Global creators collaborating on original screenplays
-- **Fan projects**: Community-driven adaptations of public domain works
-- **Educational content**: Science explainers built segment-by-segment
-- **Music videos**: Artists crowdsourcing visuals with guaranteed style consistency
-- **Corporate videos**: Brands outsourcing production to talent marketplace
+**Standard Library** = first platform solving AI consistency  
+**Streaming revenue** = earn continuously, not one-time payment  
+**Version control** = films improve forever as tech advances  
+**On-chain** = transparent ownership and payments
 
----
-
-## 🛠️ Technical Stack
-
-- **Repository Layer**: Git-based version control (GitHub/GitLab)
-- **Storage**: IPFS/Arweave for video files, cloud CDN for delivery
-- **Blockchain**: Smart contracts for NFT minting, voting, revenue distribution
-- **Standard Library**: Cloud-hosted LoRA models, ControlNets, prompt templates
-- **Playback Engine**: Real-time video assembly from highest-voted segments
+Read the details:
+- [Product Mechanism](doc/product-mechanism.md) — how the system works
+- [Tokenomics](doc/tokenomics.md) — economics and incentives  
+- [Whitepaper](doc/whitepaper.md) — technical architecture
 
 ---
 
-## 🌍 Vision
+## Use Cases
 
-**A future where**:
-- Any script can become a professional film through global collaboration
-- Creators earn fairly based on merit, not industry connections
-- Films continuously improve as technology advances
-- Audiences participate in the creative process through voting and funding
-
-**This is not just open-source filmmaking — it's Airbnb for film production, where anyone can contribute talent and earn from their work.**
+- Indie films crowdsourced globally
+- Fan projects (Shakespeare, public domain adaptations)
+- Music videos with consistent art style
+- Educational content built segment-by-segment
+- Corporate videos at scale
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
-We welcome contributions:
-- **Video segments**: Generate clips following Standard Library specs
-- **Assets**: Create LoRA models, style guides, ControlNets
-- **Code**: Platform development, smart contracts, rendering engine
-- **Documentation**: Improve guides, translations, tutorials
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+We need:
+- Video creators (claim shots, generate segments)
+- Asset builders (train LoRAs, make ControlNets)
+- Developers (platform, smart contracts, tooling)
+- Writers (docs, translations)
 
 ---
 
-## 📜 License
+## License
 
-Apache License 2.0
-
----
-
-## 🔗 Links
-
-- **Website**: [openmontage.com](https://openmontage.com) _(coming soon)_
-- **Discord**: [Join Community](https://discord.gg/openmontage) _(coming soon)_
-- **Twitter**: [@OpenMontage](https://twitter.com/openmontage) _(coming soon)_
+Apache 2.0
 
 ---
 
-**Built for the age of AI-generated content. Designed for global collaboration. Powered by crypto economics.**
+**This is Airbnb for film production. Contribute talent, earn revenue, own your work.**
+
+Links coming soon: Website • Discord • Twitter

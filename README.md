@@ -12,12 +12,9 @@ Think GitHub for films. Directors upload scripts, creators submit video segments
 
 ## What's New
 
-**From:** Centralized capital + director dictatorship  
-**To:** Decentralized collaboration + merit-driven selection
+Traditional filmmaking is centralized capital + director dictatorship. OpenMontage makes films work like open-source software: decentralized collaboration where quality wins over connections. Revenue flows to whoever's work is actually in the final cut.
 
-Films become open-source projects. Quality wins, not connections. Revenue flows to whoever's work is actually in the final cut.
-
-**Technical enabler:** Standard Library (dependency packages ensuring visual consistency across AI-generated segments)
+Technical enabler: Standard Library (dependency packages ensuring visual consistency across AI-generated segments).
 
 ---
 

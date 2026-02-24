@@ -22,16 +22,14 @@ Films evolve over time — better segments can replace old ones, shifting revenu
 
 ---
 
-## The Key Innovation: Standard Library
+## The Key Shift
 
-**Problem:** Different people using AI tools make the same character look completely different.
+**From:** Centralized capital + director dictatorship  
+**To:** Decentralized collaboration + merit-driven selection
 
-**Solution:** Every film includes a "dependency package" (like npm):
-- Character appearance models (LoRA)
-- Art style guides
-- Voice models
+Films become open-source projects. Quality wins, not connections. Revenue flows to whoever's work is actually in the final cut.
 
-Everyone pulls the same library → visual consistency across all contributions.
+**Technical enabler:** Standard Library (dependency packages ensuring visual consistency across AI-generated segments)
 
 ---
 

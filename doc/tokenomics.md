@@ -1,5 +1,15 @@
 # OpenMontage Tokenomics (Crypto Economic Model)
 
+> **Executive Summary**
+>
+> | Metric | Value |
+> |--------|-------|
+> | **Total $MONTAGE Supply** | 1,000,000,000 (1B tokens) |
+> | **Initial Circulating at TGE** | ~8% |
+> | **Platform Fee** | 2–5% of film revenue (used for buyback & burn) |
+> | **Revenue Split** | 80% creators / 15% director + Standard Library / 5% curators |
+> | **Primary Network** | Base (Coinbase L2) |
+
 Open-source initiatives without incentives often struggle to sustain themselves — especially when video generation requires significant computational costs. The crypto economic model solves the fundamental question: **"Who pays, and how do we distribute rewards?"**
 
 ---
@@ -148,6 +158,8 @@ Every revenue event triggers proportional payouts across three stakeholder group
   - Profit share (e.g., 10% of future revenue pool)
   - Exclusive behind-the-scenes content
 
+**How Ticket NFT revenue share integrates with the 80/15/5 split**: When a film has Film Ticket NFT holders, the 10% profit share comes out of the creator pool. The modified distribution becomes: 70% creators / 15% initiator & Standard Library / 5% curators / 10% Ticket NFT holders = 100%. Films without Ticket NFTs retain the standard 80/15/5 split.
+
 **Example**: 10,000 Ticket NFTs sold at $50 each = $500,000 production budget
 
 ---
@@ -175,7 +187,71 @@ Every revenue event triggers proportional payouts across three stakeholder group
 
 ---
 
-## 6. Anti-Gaming Mechanisms
+## 6. Token Allocation & Distribution
+
+### 6.1 $MONTAGE Token Allocation
+
+| Allocation | % | Amount | Vesting |
+|------------|---|--------|---------|
+| Community Rewards | 30% | 300,000,000 | Released over 5 years, earned through platform activity (contributing, voting, curating) |
+| Ecosystem & Grants | 20% | 200,000,000 | 3-year linear vest, governed by DAO, for film projects, developer grants, partnerships |
+| Team & Advisors | 15% | 150,000,000 | 4-year vest, 1-year cliff |
+| Treasury Reserve | 15% | 150,000,000 | Unlocked but requires DAO vote to spend |
+| Public Sale / IDO | 10% | 100,000,000 | 30% at TGE, remaining over 12 months |
+| Seed & Strategic | 7% | 70,000,000 | 2-year vest, 6-month cliff |
+| Liquidity Provision | 3% | 30,000,000 | At TGE for DEX liquidity |
+
+### 6.2 Circulating Supply Projection
+
+The table below projects year-by-year token unlocks based on the vesting schedules above. TGE is projected for Q1 2027.
+
+| Year | New Tokens Released | Cumulative Circulating | % of Total Supply |
+|------|--------------------|-----------------------|-------------------|
+| TGE (Q1 2027) | 80,000,000 | 80,000,000 | 8.0% |
+| End Year 1 (2027) | 155,000,000 | 235,000,000 | 23.5% |
+| End Year 2 (2028) | 175,000,000 | 410,000,000 | 41.0% |
+| End Year 3 (2029) | 160,000,000 | 570,000,000 | 57.0% |
+| End Year 4 (2030) | 130,000,000 | 700,000,000 | 70.0% |
+| End Year 5 (2031) | 100,000,000 | 800,000,000 | 80.0% |
+| Long-tail (2032+) | 200,000,000 | 1,000,000,000 | 100.0% |
+
+**Notes**:
+- TGE circulating comprises: 30% of Public Sale (30M) + Liquidity Provision (30M) + early Community Rewards (20M) = ~80M tokens
+- Buyback & burn from platform fees reduces effective circulating supply over time, partially offsetting new unlocks
+- Treasury Reserve tokens (150M) are technically unlocked but require DAO governance votes and are excluded from circulating supply until deployed
+
+---
+
+## 7. Game Theory & Economic Sustainability Analysis
+
+### Why Creators Compete (Not Collude)
+
+The replacement mechanic ensures that each creator's revenue is directly proportional to their screen time — a zero-sum dynamic relative to the total creator pool. If your 30-second clip is in a 90-minute film, you earn exactly (30/5400) of the 80% creator pool. The only way to earn more is to hold more screen time with higher-quality work. Colluding on mediocre submissions would be self-defeating: it would lower overall film quality, reduce audience revenue, and shrink everyone's earnings. Meanwhile, any single defector who submits genuinely excellent work captures the slot and profits. The Nash equilibrium is honest competition.
+
+The replacement mechanic amplifies this further. Even after a clip is merged, it can be displaced by a superior submission at any time. This creates constant competitive pressure — creators cannot rest on past success. The result is a "benevolent arms race" where each new AI model release (Sora v4, Runway Gen-4) triggers a wave of improved submissions, and films organically improve over time.
+
+### Why Curators Vote Honestly
+
+Curators earn 5% of a film's total revenue. Their earnings are directly tied to the film's commercial success — which depends on audience satisfaction — which depends on segment quality. A curator who votes for low-quality segments is voting to reduce their own income. This alignment is reinforced by the reputation system: curators who consistently back winning segments (those that remain merged longest and generate the most revenue) earn reputation bonuses that increase their voting weight. Conversely, coordinated bad voting triggers stake slashing, making collusion economically irrational. The blind voting period prevents social signaling and bandwagoning, forcing curators to evaluate quality independently.
+
+### Minimum Viable Revenue Analysis
+
+For the platform to sustain contributor engagement, the economics must be compelling at the individual level. Consider the cost structure for a typical AI creator:
+
+- **Cost to generate one shot**: $5–$20 in compute costs (Runway/Sora API fees, GPU time for LoRA-based generation)
+- **Time investment**: 2–4 hours including prompt iteration, Standard Library integration, and quality refinement
+- **Break-even scenario**: A 30-second clip in a film earning $5,000/month generates approximately $44/month in passive income
+- **Payback period**: 2–4 months to recover compute and time costs
+
+This creates a positive ROI even for modestly successful films. For a creator with 3 segments in a $50,000/month film, monthly earnings reach $2,200+ — a meaningful income stream from a portfolio of contributions. The passive, ongoing nature of the earnings (as long as the segment remains merged) compounds the value proposition far beyond one-time freelance work.
+
+### Network Effects
+
+OpenMontage exhibits strong positive network effects across multiple dimensions. More quality films attract more audience, which generates more revenue per creator, which attracts more top creators, which produces higher quality films. This virtuous cycle is the core flywheel. Standard Libraries compound the effect: as directors build increasingly sophisticated character LoRAs, style guides, and ControlNets, these assets become valuable infrastructure with secondary market potential (licensing Standard Libraries across films). Finally, $MONTAGE staking rewards tie token demand directly to platform usage — as more creators and curators participate, demand for voting power grows, creating organic buy pressure that benefits all token holders.
+
+---
+
+## 8. Anti-Gaming Mechanisms
 
 ### Sybil Resistance
 - **Identity verification** (optional) for higher voting weight
@@ -190,7 +266,7 @@ Every revenue event triggers proportional payouts across three stakeholder group
 
 ---
 
-## 7. Economic Flywheel
+## 9. Economic Flywheel
 
 ```
 More Revenue → Higher Creator Earnings → Attracts Better Talent → Higher Quality Films → More Audience → More Revenue
@@ -204,7 +280,7 @@ More Revenue → Higher Creator Earnings → Attracts Better Talent → Higher Q
 
 ---
 
-## 8. Comparison: Traditional vs. OpenMontage
+## 10. Comparison: Traditional vs. OpenMontage
 
 | Aspect | Traditional | OpenMontage |
 |--------|-------------|-------------|
@@ -216,14 +292,15 @@ More Revenue → Higher Creator Earnings → Attracts Better Talent → Higher Q
 
 ---
 
-## 9. Case Study: Revenue Distribution Example
+## 11. Case Study: Revenue Distribution Example
 
 ### Film: "Cyberpunk Dreams" (90 minutes, 150 segments)
 
 **Monthly Revenue**: $50,000
 
 **Distribution**:
-- Initiator + Standard Library: $7,500 (15%)
+- Film Initiator: $5,000 (10%)
+- Standard Library Creators: $2,500 (5%)
 - Voters: $2,500 (5%)
 - **Segment Creators: $40,000 (80%)**
 
@@ -239,7 +316,7 @@ More Revenue → Higher Creator Earnings → Attracts Better Talent → Higher Q
 
 ---
 
-## 10. Future Enhancements
+## 12. Future Enhancements
 
 - **DeFi Integration**: Clip NFTs as collateral for loans
 - **Fractional Ownership**: Split Clip NFT ownership among team members
@@ -258,5 +335,6 @@ This is not just Git for movies — it's **Airbnb for film production**, where a
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-02-24
+**Version**: 1.1
+**Last Updated**: 2026-03-03
+**Authors**: OpenMontage Core Team

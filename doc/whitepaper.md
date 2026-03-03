@@ -1,6 +1,6 @@
 # OpenMontage Whitepaper
 
-**Version 1.0 — Git for Movies**
+**Version 1.1 — Git for Movies**
 
 ---
 
@@ -274,19 +274,25 @@ All revenue flows into **Treasury Smart Contract** for automated distribution.
 ```solidity
 TreasuryRevenue = TotalRevenue - PlatformFee (2-5%)
 
-Initiator_Share = TreasuryRevenue × 15%
+Initiator_Share = TreasuryRevenue × 10%
+StdLib_Share = TreasuryRevenue × 5%
 Curator_Share = TreasuryRevenue × 5%
 Creator_Pool = TreasuryRevenue × 80%
+
+// The 15% initiator allocation is sub-split:
+//   - 10% to the film initiator (director/producer)
+//   - 5% to Standard Library asset creators (split proportionally if multiple contributors)
 
 // Per-creator calculation
 Creator_Earnings = Creator_Pool × (Clip_Duration / Total_Film_Duration)
 ```
 
-**Example** (90-minute film, $50,000/month revenue):
+**Example** (90-minute film, $50,000/month treasury revenue after platform fee):
 
 | Stakeholder | Calculation | Monthly Earnings |
 |-------------|-------------|------------------|
-| Initiator + Standard Library | $50k × 15% | $7,500 |
+| Film Initiator | $50k × 10% | $5,000 |
+| Standard Library Creators | $50k × 5% | $2,500 |
 | Curators | $50k × 5% | $2,500 |
 | Creator A (3 segments, 5 min total) | $40k × (5/90) | $2,222 |
 | Creator B (1 segment, 30 sec) | $40k × (0.5/90) | $222 |
@@ -341,7 +347,7 @@ Creator_Earnings = Creator_Pool × (Clip_Duration / Total_Film_Duration)
 - Social graph analysis (penalize new isolated accounts)
 
 **Collusion Prevention**:
-- Randomized voting periods
+- Blind voting with fixed 72-hour period (votes hidden until close)
 - Stake slashing for consistent low-quality votes
 - Minimum submission quality threshold (automated checks)
 
@@ -383,9 +389,23 @@ Creator_Earnings = Creator_Pool × (Clip_Duration / Total_Film_Duration)
 └─────────────────┘
 ```
 
+> **Note**: Phase 1 uses Discord as the primary frontend (see Section 6.5). The web/mobile frontend replaces Discord in Phase 2-3.
+
 ### 6.2 Smart Contracts
 
-**Core Contracts**:
+#### Target Chain: Base (Coinbase L2)
+
+OpenMontage will deploy on **Base**, Coinbase's Ethereum L2 rollup, as the primary chain. Rationale:
+
+- **Low fees**: Sub-cent transaction costs make frequent minting and voting economically viable for creators
+- **Creator ecosystem**: Base has cultivated the largest on-chain creator community (Zora, Friend.tech), aligning with OpenMontage's target users
+- **Coinbase onramp**: Seamless fiat-to-crypto for non-crypto-native filmmakers and audiences
+- **Ethereum security**: Inherits Ethereum's security guarantees as an OP Stack rollup
+- **EVM compatibility**: Standard Solidity tooling (Hardhat, Foundry, OpenZeppelin)
+
+**Fallback**: Arbitrum One serves as the secondary deployment target if Base throughput or ecosystem conditions change. Base uses OP Stack and Arbitrum uses Nitro, but both are EVM-compatible rollups, so contract migration requires minimal changes.
+
+#### Core Contracts
 
 1. **ClipNFT.sol** — ERC-721 for segment ownership
 2. **MovieNFT.sol** — Composite NFT with dynamic pointer array
@@ -393,12 +413,32 @@ Creator_Earnings = Creator_Pool × (Clip_Duration / Total_Film_Duration)
 4. **Voting.sol** — Weighted voting & governance
 5. **StandardLibrary.sol** — Dependency versioning & compliance checks
 
-**Key Functions**:
+#### Contract Interfaces
+
 ```solidity
+// ─── ClipNFT.sol ───────────────────────────────────────────────
 function submitClip(uint filmId, uint shotId, string videoHash) external returns (uint clipId);
-function voteOnClip(uint clipId, uint8 rating) external;
 function mergeClip(uint shotId, uint clipId) external; // Governance-controlled
+function archiveClip(uint clipId) external;
+
+event ClipSubmitted(uint indexed filmId, uint indexed shotId, uint clipId, address creator);
+event ClipMerged(uint indexed shotId, uint clipId, uint previousClipId);
+event ClipArchived(uint indexed clipId);
+
+modifier onlyStandardLibraryCompliant(uint filmId, bytes32 contentHash);
+
+// ─── Treasury.sol ──────────────────────────────────────────────
 function distributeRevenue(uint filmId) external; // Automated cron job
+function claimRevenue(uint clipId) external returns (uint amount);
+function calculateEarnings(uint clipId, uint period) public view returns (uint);
+
+// ─── Voting.sol ────────────────────────────────────────────────
+function voteOnClip(uint clipId, uint8 rating) external;
+function getVotingPower(address voter) public view returns (uint);
+function openVotingPeriod(uint shotId) external;
+function closeVotingPeriod(uint shotId) external returns (uint winningClipId);
+
+event VoteCast(address indexed voter, uint clipId, uint8 score, uint weight);
 ```
 
 ### 6.3 Standard Library Distribution
@@ -438,6 +478,87 @@ function distributeRevenue(uint filmId) external; // Automated cron job
 - Adaptive bitrate streaming (HLS/DASH)
 - Regional CDN edge caching
 
+### 6.5 Discord-First Platform Strategy
+
+Rather than building a full web application from day one, OpenMontage launches **Discord-first** — using Discord as the primary user interface for Phase 1, then progressively migrating to a standalone web app.
+
+#### Why Discord First
+
+Discord is where creator and crypto-native communities already live. By meeting users where they are, OpenMontage eliminates onboarding friction, leverages Discord's built-in identity/roles/moderation, and can ship a usable product in weeks rather than months. A custom web frontend is expensive and risky before product-market fit is validated.
+
+#### Architecture
+
+```
+┌──────────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌──────────────┐
+│   Discord    │────▶│  Bot Backend     │────▶│  Web3 Provider  │────▶│   Smart      │
+│   (User UI)  │◀────│  (Node.js API)   │◀────│  (ethers.js)    │◀────│   Contracts  │
+└──────────────┘     └──────────────────┘     └─────────────────┘     │   (Base L2)  │
+                              │                                        └──────────────┘
+                              ▼
+                     ┌──────────────────┐
+                     │  IPFS / Arweave  │
+                     │  (Video Storage) │
+                     └──────────────────┘
+```
+
+The Discord bot translates user actions into blockchain transactions:
+- `/submit <shot-id>` → uploads video to IPFS, calls `ClipNFT.submitClip()`
+- `/vote <clip-id> <score>` → calls `Voting.voteOnClip()` with staked weight
+- `/claim` → calls `Treasury.claimRevenue()` for the user's merged clips
+- `/library <film-id>` → fetches Standard Library download links from CDN
+- `/status <film-id>` → displays film progress, open shots, active votes
+
+Users link their wallet once via `/connect-wallet` and all subsequent commands are signed through a custodial relay or WalletConnect session.
+
+#### Transition Path
+
+| Phase | Interface | Notes |
+|-------|-----------|-------|
+| **Phase 1** (Q2-Q3 2026) | Discord-only | Bot handles all workflows; testnet deployment |
+| **Phase 2** (Q4 2026) | Discord + Web Dashboard | Read-only dashboard for browsing films, viewing stats; Discord remains primary for actions |
+| **Phase 3** (2027+) | Full Web App + Discord notifications | Standalone web app for all workflows; Discord bot transitions to notification/alert role |
+
+This incremental approach validates the core product loop (submit → vote → earn) cheaply before investing in custom frontend infrastructure.
+
+### 6.6 Security Considerations
+
+#### Smart Contract Auditing
+
+All core contracts (ClipNFT, MovieNFT, Treasury, Voting, StandardLibrary) will undergo two independent audits before mainnet deployment:
+
+1. **OpenZeppelin** — industry-standard audit for ERC-721 compliance, access control, and upgrade patterns
+2. **Trail of Bits** — adversarial review focused on economic exploits, MEV risks, and governance attacks
+
+Audit reports will be published publicly. Critical findings must be resolved before deployment; medium-severity findings tracked in a public issue tracker with remediation timeline.
+
+#### Reentrancy Protection
+
+Treasury.sol is the highest-risk contract due to direct ETH/ERC-20 transfers. All payout functions implement the **checks-effects-interactions** pattern:
+
+1. Validate caller eligibility and compute amounts (checks)
+2. Update internal accounting and mark claims as processed (effects)
+3. Transfer funds last (interactions)
+
+Additionally, all external-facing functions in Treasury.sol use OpenZeppelin's `ReentrancyGuard` as defense-in-depth.
+
+#### Oracle and Price Feed Risks
+
+Revenue attribution for pay-per-view and advertising requires off-chain data. The platform uses **Chainlink Data Feeds** for ETH/USD price conversion and a custom Chainlink Functions integration for revenue event reporting. Oracle failure is mitigated by a 24-hour staleness check — if price data is stale, revenue distribution pauses until fresh data arrives.
+
+#### Upgrade Strategy
+
+Phase 1 contracts deploy behind **OpenZeppelin TransparentProxy** to allow bug fixes during early operation. Proxy admin is the team multi-sig (see below). After the protocol stabilizes (Phase 3), governance can vote to either:
+- Lock proxies permanently (immutable)
+- Migrate to new immutable contracts with a 30-day migration window
+
+#### Emergency Pause
+
+All core contracts inherit OpenZeppelin's `Pausable`. The team multi-sig can pause any contract in response to exploits or critical bugs. Pause authority transfers to the DAO Governor contract in Phase 3.
+
+#### Key Management
+
+Phase 1 operations are controlled by a **3-of-5 Gnosis Safe multi-sig** composed of founding team members. Signers are geographically distributed and use hardware wallets. The multi-sig controls: contract upgrades, emergency pause, treasury parameter changes, and initial governance settings.
+
 ---
 
 ## 7. Roadmap
@@ -445,16 +566,15 @@ function distributeRevenue(uint filmId) external; // Automated cron job
 ### Phase 1: Foundation (Q2-Q3 2026)
 - ✅ Whitepaper & documentation
 - ⏳ Core smart contracts (testnet)
-- ⏳ Basic web interface
+- ⏳ Discord bot (MontageBot v0.1)
 - ⏳ Standard Library spec v1.0
 - ⏳ Pilot film project (community test)
 
 ### Phase 2: Alpha Launch (Q4 2026)
-- Mainnet deployment (Ethereum L2 or Solana)
+- Mainnet deployment on Base (Coinbase L2)
 - Public film repository platform
 - Voting & curation tools
 - Film Ticket NFT crowdfunding
-- Mobile apps (iOS/Android)
 
 ### Phase 3: Ecosystem Growth (2027)
 - $MONTAGE governance token launch
@@ -462,6 +582,7 @@ function distributeRevenue(uint filmId) external; // Automated cron job
 - Cross-film asset marketplace
 - AI-powered consistency validation
 - DeFi integration (Clip NFT collateralized loans)
+- Mobile apps (iOS/Android)
 
 ### Phase 4: Mass Adoption (2028+)
 - Partnerships with film festivals
@@ -493,6 +614,8 @@ Brands outsource production to global talent marketplace, paying only for final 
 
 ## 9. Competitive Analysis
 
+> For a comprehensive competitive landscape analysis, see [Competitive Analysis](competitive-analysis.md).
+
 | Platform | Model | Consistency Solution | Revenue Model | Iteration |
 |----------|-------|---------------------|---------------|-----------|
 | **OpenMontage** | Decentralized Git | Mandatory Standard Library | 80% streaming revenue | Segments replaceable |
@@ -515,8 +638,8 @@ Brands outsource production to global talent marketplace, paying only for final 
 - Mitigation: IPFS/Arweave for permanent storage, CDN for delivery
 - Contributors cover initial upload costs (offset by revenue potential)
 
-**Blockchain Fees**  
-- Mitigation: Deploy on L2 (Arbitrum, Optimism) or Solana for low gas fees
+**Blockchain Fees**
+- Mitigation: Deploy on Base (Coinbase L2) for sub-cent transaction costs, with Arbitrum as fallback
 
 ### 10.2 Legal Risks
 
@@ -560,6 +683,6 @@ OpenMontage transforms filmmaking from a centralized, capital-intensive industry
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: 2026-02-24  
+**Version**: 1.1
+**Last Updated**: 2026-03-03
 **Authors**: OpenMontage Core Team

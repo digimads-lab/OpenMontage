@@ -4,26 +4,79 @@
   <img src="logo.jpg" alt="OpenMontage Logo" width="200"/>
 </p>
 
-**Open-source collaborative filmmaking**
+**Git for Movies — Collaborative AI Filmmaking**
 
-OpenMontage is a GitHub-inspired platform for creating videos through community collaboration. Just as developers contribute code to open-source projects, creators can contribute video segments to collaborative films.
+![Status](https://img.shields.io/badge/Status-Pre--Alpha-orange)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue)
+[![Discord](https://img.shields.io/badge/Discord-Join%20Us-7289DA?logo=discord&logoColor=white)](https://discord.gg/openmontage)
+[![Twitter](https://img.shields.io/badge/Twitter-@OpenMontage-1DA1F2?logo=twitter&logoColor=white)](https://twitter.com/openmontage)
 
-## Vision
+> Anyone can contribute a scene to a film. The best version wins. Everyone earns.
 
-In the age of AI, anyone can create video segments and blend them seamlessly with others' work. With enough contributors, even a simple script can become a polished, professional-looking film through the collective creativity of the community.
+---
+
+## The Problem
+
+AI video tools have made it possible for anyone to generate cinematic footage — but there's no way to combine work from hundreds of creators into a single, coherent film. Different creators produce incompatible styles, there's no economic incentive to contribute, and once a film ships, it can never improve. The result: incredible individual clips, but no collaborative films.
+
+## Our Solution
+
+- **Standard Library** — Every film ships a dependency package (character LoRAs, style guides, voice models) so all contributors produce visually consistent output
+- **Pull Request workflow** — Creators claim shots, generate segments with AI tools, and submit for community review
+- **Merit-based earnings** — 80% of revenue goes to creators, split by screen time. Your clip earns as long as it's in the final cut
+- **Living films** — Better segments can replace older ones. Films improve as AI technology advances
 
 ## How It Works
 
-1. **Script Foundation** — A screenplay is broken down into multiple segments
-2. **Community Contribution** — Contributors create video clips for each segment (using AI generation tools, filming, or other methods)
-3. **Voting & Selection** — The community votes on different versions of each segment
-4. **Automated Assembly** — The highest-rated segments are combined into a complete film
-5. **Iterative Improvement** — As more contributors join, the final video evolves and improves over time
+1. **Director** uploads a script and decomposes it into individual shots
+2. **Creators** generate video segments using AI tools (Sora, Runway, Kling, ComfyUI) with the film's Standard Library
+3. **Community** votes to select the best version of each shot
+4. **Platform** assembles the winning segments into a seamless film
+5. **Revenue** splits automatically: 80% creators, 15% director & Standard Library, 5% voters
 
-## Contributing
+Platform lives on Discord — [join to start contributing](https://discord.gg/openmontage).
 
-We welcome contributions of all kinds — video segments, scripts, tooling, and ideas. See our documentation for more details.
+## Current Status
+
+**Pre-Alpha** | Phase 1 Planning | Q2 2026 Launch Target
+
+We're actively building: smart contracts on Base L2, Discord bot, and recruiting pilot film creators.
+
+---
+
+## Quick Start
+
+### As a Director
+Join Discord → `/create-film` → upload your script → build your Standard Library → launch
+
+### As a Creator (AI Video Artist)
+Join Discord → browse `#film-listings` → claim a shot → submit your work → earn revenue
+
+### As a Curator / Voter
+Join Discord → vote on submissions → earn 5% of film revenue
+
+---
+
+## Documentation
+
+Start with the Whitepaper for the full vision, then Product Mechanism for workflows, and Tokenomics for the economic model. The Contributing Guide is for hands-on participants.
+
+- [Whitepaper](doc/whitepaper.md) — Full technical architecture and vision
+- [Product Mechanism](doc/product-mechanism.md) — Workflows, Standard Library, version control
+- [Tokenomics](doc/tokenomics.md) — NFT ownership and revenue distribution
+- [Discord Platform](doc/discord-platform.md) — Discord server design and bot commands
+- [Governance](doc/governance.md) — Voting mechanics and governance framework
+- [Roadmap](doc/roadmap.md) — Development timeline and milestones
+- [Competitive Analysis](doc/competitive-analysis.md) — Market landscape
+
+## Community
+
+- **Discord**: [discord.gg/openmontage](https://discord.gg/openmontage)
+- **Twitter**: [@OpenMontage](https://twitter.com/openmontage)
+- **GitHub**: [github.com/digimads-lab/OpenMontage](https://github.com/digimads-lab/OpenMontage)
+
+Want to contribute? Read our [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 
-Apache License 2.0
+Apache 2.0 — see [LICENSE](LICENSE) for details.

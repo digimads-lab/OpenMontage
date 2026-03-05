@@ -1,832 +1,653 @@
 # OpenMontage Whitepaper
 
-**Version 1.2 — Git for Movies**
+**Version 3.0 — Git for Movies: Decentralized AI Collaborative Filmmaking**
 
 ---
 
-## Abstract
+## Documentation Suite
 
-OpenMontage is a decentralized platform for collaborative filmmaking that solves the three fundamental barriers to AI-powered crowdsourced video production:
+This whitepaper provides the authoritative overview of OpenMontage. For detailed specifications, refer to the companion documents:
 
-1. **Visual/audio consistency** via mandatory Standard Library dependencies
-2. **Economic sustainability** through NFT-based ownership and streaming revenue
-3. **Quality assurance** using version control and community governance
-
-By combining Git-style workflows, blockchain tokenomics, and AI generation tools, OpenMontage enables anyone to contribute professional video segments to evolving films while earning proportional revenue.
-
----
-
-## 1. Introduction
-
-### 1.1 The AI Video Revolution
-
-AI tools like Sora, Runway, and Pika have democratized video creation. However, producing a **complete, high-quality film** through crowdsourced AI generation faces critical challenges:
-
-**The Consistency Problem**  
-Different creators using AI tools produce incompatible visual styles, character appearances, and audio — making collaborative work look disjointed.
-
-**The Incentive Problem**  
-Video generation requires significant computational costs and creative effort. Without economic rewards, contributors lack motivation to participate.
-
-**The Quality Problem**  
-Traditional filmmaking is “append-only” — once released, films cannot improve. Yet AI technology advances rapidly, enabling better lighting, motion, and effects.
-
-### 1.2 Our Solution: Git for Movies
-
-OpenMontage applies software development principles to filmmaking:
-
-- **Modularization**: Scripts decomposed into discrete Shots (like functions in code)
-- **Dependency management**: Mandatory Standard Library ensures consistency (like npm packages)
-- **Version control**: Better segments replace existing ones via Pull Requests
-- **Transparent economics**: Blockchain-based ownership and automated revenue distribution
-
-**Vision**: A future where any script becomes a professional film through global collaboration, with creators earning fairly based on merit.
+| Document | Contents |
+|----------|---------|
+| [Operations Manual](operations.md) | Discord platform, bot commands, director/creator/backer workflows, roadmap |
+| [Technical Specification](technical-spec.md) | Smart contracts, storage architecture, API design, security |
+| [Economics & Governance](economics-governance.md) | NFT mechanics, Menu Auction math, $MONTAGE token, governance framework |
 
 ---
 
-## 2. Core Architecture
+## Executive Summary
 
-### 2.1 The Film Repository
+OpenMontage is a decentralized platform that applies Git-style version control and open-source collaboration principles to film production. It enables global communities to collaboratively create professional-quality films using AI video generation tools, with automated, transparent revenue distribution enforced by smart contracts.
 
-Each film is organized as a **Git repository**:
+The platform addresses three structural failures that have prevented crowdsourced AI filmmaking from producing coherent, professional output: the **consistency problem** (independently generated clips look incompatible), the **incentive problem** (contributors have no economic stake in the outcome), and the **quality problem** (traditional films cannot improve after release, yet AI capabilities advance rapidly).
+
+OpenMontage’s solution rests on four mutually reinforcing innovations:
+
+1. **Standard Library** — A mandatory per-film dependency package (character LoRA models, style guides, prompt templates, ControlNets, voice models) that enforces visual and audio consistency across all contributors, the same way npm packages enforce API compatibility in software projects.
+
+2. **Pull Request Workflow** — Scripts are decomposed into discrete Shots, each an independently claimable unit of work. Contributors generate video segments, submit them as Pull Requests, and earn proportional revenue based on screen time in the final film.
+
+3. **Shot Market Menu Auctions** — Each Shot becomes a sealed menu auction where community backers submit valuation menus expressing preferences across ALL competing clips. The clip with the highest aggregate quadratic-weighted valuation (`SelectionWeight = √(CreatorBond) + Σ√(valuation_i)`) wins. Adapted from the Bernheim-Whinston (1986) menu auction framework, this produces efficient outcomes under the quadratic-weighted objective and eliminates the “backing a loser” penalty — backers pay only their stated valuation for whichever clip wins.
+
+4. **NFT-Driven Economics** — Clip NFTs establish immutable authorship; Film NFTs represent copyright and director revenue rights; Film Ticket NFTs enable crowdfunding. Revenue is distributed automatically via smart contracts at a **75/10/5/10 split**: creators receive 75% proportional to screen time, Film NFT holders receive 10%, Standard Library contributors receive 5%, and backers of merged clips receive 10%.
+
+**Key metrics at a glance:**
+
+| Parameter | Value |
+|-----------|-------|
+| Revenue split | 75% creators / 10% Film NFT holder / 5% Standard Library / 10% backers |
+| Creator Bond (submission) | 50 USDC per clip |
+| Film Creation Bond | Minimum 500 USDC (50% refundable upon completion) |
+| Challenge Bond | 100 USDC (2x Creator Bond) |
+| Losing Creator refund | 75% of Creator Bond returned |
+| Competition Tax | 5% of losing Creator Bonds → Film Treasury |
+| Reward Pool | 20% of losing Creator Bonds → split between winning creator (50%) and winning backers (50%) |
+| Primary network | Base (Coinbase L2) |
+| Governance token | $MONTAGE — platform governance only; Shot Market menu auctions use USDC |
+
+OpenMontage is not a film financing DAO, an NFT collectible platform, or an AI video tool. It is the **production infrastructure layer** for collaborative AI filmmaking — the Git repository, npm registry, and revenue distribution engine that makes professional crowdsourced films economically viable for the first time.
+
+---
+
+## 1. Problem Statement
+
+### 1.1 The AI Video Revolution and Its Limits
+
+AI video generation has crossed a meaningful quality threshold. Tools such as Sora, Runway Gen-3, Pika, Kling, and open-source pipelines built on Stable Diffusion Video can now produce cinematic-quality footage from text prompts in minutes. For the first time in history, an individual creator without access to cameras, crews, or production budgets can generate footage that rivals professional output.
+
+The logical next step — crowdsourced, collaborative AI filmmaking — has not materialized. Despite the tools existing, no community has successfully produced a complete, coherent, professional-quality film through distributed AI generation. The reason is structural, not creative. Three fundamental barriers block the path from “AI can generate impressive clips” to “communities can produce complete films.”
+
+### 1.2 Barrier One: The Consistency Problem
+
+A film is a coherent visual narrative. Its protagonist must look the same in every scene. The lighting and color palette must feel unified across 100 different shots. The audio — character voices, ambient sound design — must match across contributors who have never coordinated directly.
+
+When ten different creators independently generate clips for the same film using current AI tools, they produce ten incompatible versions of every element. Character faces drift between scenes. Color grading varies from naturalistic to high-contrast without motivation. Voice synthesis models produce different tonal qualities for the same character.
+
+This is not a problem of creator skill. It is a problem of missing infrastructure. Software development faced an analogous challenge before package managers: libraries written by different developers could not be easily composed because there were no enforced interfaces, versioning, or dependency standards. npm, pip, and Cargo solved this for software. No equivalent exists for AI video production.
+
+**The result**: Collaborative AI filmmaking produces footage libraries, not films.
+
+### 1.3 Barrier Two: The Incentive Problem
+
+AI video generation is not free. A high-quality 10-second clip may require $5–$20 in API costs, hours of iterative prompt engineering, and non-trivial technical expertise. A contributor who invests this effort in a crowdsourced project has no mechanism to recover their costs or earn a return proportional to their contribution’s value to the final product.
+
+Existing platforms that have attempted crowdsourced content creation — YouTube collaborations, open video projects, fan film initiatives — rely entirely on intrinsic motivation: passion for the project, desire for recognition, community belonging. These motivations are real but insufficient at scale. Without economic returns, participation is concentrated among the most devoted fans and burns out quickly. Projects rarely reach completion.
+
+**The result**: Most collaborative film projects stall before completion because contributors cannot justify the sustained effort without economic incentive.
+
+### 1.4 Barrier Three: The Quality Problem
+
+Traditional film production follows an “append-only” model. Once a film is released, its content is fixed. This made sense when reshooting footage was prohibitively expensive and time-consuming. It is a poor fit for an AI-native production model in which regenerating a scene at higher quality — using a newly released AI model — takes hours rather than months and costs dollars rather than millions.
+
+A collaborative film produced in early 2026 using current AI tools will look dated by mid-2027 as generation models improve by an order of magnitude. There is no mechanism in traditional filmmaking, or in any existing collaborative platform, to systematically improve individual segments of a completed work as better tools become available.
+
+**The result**: AI films are locked to the quality ceiling of the tools available at production time, even as those tools advance rapidly.
+
+---
+
+## 2. The Solution: Git for Movies
+
+### 2.1 Core Philosophy
+
+OpenMontage’s insight is that these three barriers are not unique to filmmaking — they are well-understood problems in software development, and software development has solved them.
+
+- The consistency problem is solved by **dependency management**: enforced interfaces and shared libraries that ensure independently written modules work together.
+- The incentive problem is solved by **economic participation**: ownership stakes that align contributor effort with project success.
+- The quality problem is solved by **version control**: the ability to replace any component with a better version, with community consensus determining what “better” means.
+
+OpenMontage applies these principles to filmmaking through a system of four integrated innovations. Each addresses one barrier directly; together, they create a self-reinforcing platform.
+
+### 2.2 Innovation One: The Standard Library (Solving Consistency)
+
+Every film on OpenMontage must publish an official **Standard Library** before accepting contributor submissions. The Standard Library is a mandatory dependency package — analogous to a project’s `package.json` and its locked dependencies — that every contributor must use when generating their clips.
+
+A Standard Library contains:
+
+**Character LoRA Models** — Pre-trained Stable Diffusion LoRA models for every primary character. When contributors load the protagonist’s LoRA into their generation pipeline, the resulting character retains consistent facial structure, hair, and clothing across all submissions, regardless of which creator generated it or which AI base model they used.
+
+**Art Direction Assets** — Color palette definitions, lighting reference images, cinematography notes (lens characteristics, camera angle conventions, depth-of-field guidance). These translate the director’s visual intent into parameters that AI generation tools can implement consistently.
+
+**Prompt Templates** — Standardized prompt structures that contributors follow when describing their scenes. Templates encode the style tokens, negative prompts, and structural conventions that produce footage matching the film’s visual language.
+
+**ControlNet Specifications** — 3D skeletal rigs or pose control networks for character animation. These ensure that character movement and posture are consistent across the film’s action sequences.
+
+**Voice Clone Models** — Authorized text-to-speech models for each character, trained on reference audio. Dialogue scenes across the film share consistent vocal timbre and delivery style regardless of which creator handled that shot.
+
+The Standard Library is versioned using Semantic Versioning (SemVer). Minor updates — adding a supporting character model, refining a prompt template — can be made by the director unilaterally. Major breaking changes (retraining core character LoRAs, fundamental art style shifts) require 70% approval from active contributors (defined as any wallet with at least one submission in the last 30 days) and a two-week migration period.
+
+The Standard Library transforms collaborative AI filmmaking from a coordination problem into a technical constraint. Contributors do not need to coordinate their visual choices — they simply load the same dependencies.
+
+### 2.3 Innovation Two: The Pull Request Workflow (Modular Creation)
+
+OpenMontage decomposes screenplays into **Shots** — discrete, independently producible units of the film, analogous to functions in software code. Each Shot has a defined scope: a scene excerpt, a specific camera angle, defined characters, a duration target.
+
+The contributor workflow mirrors a Git pull request:
+
+1. **Claim** — A creator browses available Shots in a film repository and claims one for a 72-hour exclusive work window.
+2. **Pull Dependencies** — The creator downloads the film’s Standard Library assets via the `/standard-library` command.
+3. **Generate** — The creator uses their preferred AI tools (Runway, ComfyUI, Sora, Kling, or any compatible pipeline), loading Standard Library assets into their generation workflow.
+4. **Submit** — The creator uploads the generated video segment with a 50 USDC Creator Bond, paying to enter the shot’s competition. The submission is minted as a Clip NFT recording authorship, the Standard Library version used, and the video’s IPFS hash.
+5. **Compete** — Multiple submissions for the same Shot enter a Shot Market menu auction, where community backers submit sealed valuation menus expressing preferences across all competing clips.
+6. **Merge or Archive** — The winning clip is merged into the film’s Main Branch and begins earning streaming revenue proportionally to its screen time. Losing clips are archived; their creators receive a 75% bond refund.
+
+This workflow produces a film manifest (`film.json`) — a Film NFT that dynamically references the currently-merged Clip NFT for each Shot, updating as menu auctions resolve and as replacement challenges succeed.
+
+### 2.4 Innovation Three: Shot Market Menu Auctions (Quality Selection)
+
+The mechanism that selects the winning clip for each Shot is OpenMontage’s most significant departure from conventional platform design. Rather than collecting token votes or requiring backers to commit to a single clip, Shot Market menu auctions let backers express valuations across ALL competing clips via sealed menus. Adapted from the Bernheim-Whinston (1986) menu auction framework, this produces efficient outcomes under the quadratic-weighted objective in truthful equilibrium.
+
+Each Shot Market follows a **sealed menu commit-reveal** protocol:
+
+**Submission Phase (14 days)**: Creators submit clips and pay the 50 USDC Creator Bond. Multiple submissions per Shot are encouraged; competition improves outcomes. The auction phase opens once at least two submissions exist.
+
+**Commit Phase (5 days)**: Backers construct a **valuation menu** — a set of valuations, one per clip — and generate a commitment hash: `keccak256(clipId_1, v_1, clipId_2, v_2, ..., salt)`. They deposit USDC equal to their highest valuation (max(v_i)). During the commit phase, only commitment counts per shot are publicly visible — valuations, clip preferences, and backer identities remain hidden until reveal. This eliminates bandwagoning and herding. Every backer must independently assess all clips.
+
+**Reveal Phase (2 days)**: Backers reveal their full valuation menus. The contract verifies each reveal matches the stored hash and that max(valuations) <= deposit. Backers who fail to reveal forfeit their deposit to the reward pool.
+
+**Resolution**: The clip with the highest **aggregate quadratic SelectionWeight** wins:
 
 ```
-/space-odyssey-2077/
-├── film.json                    # Root manifest (metadata + segment pointers)
-├── README.md                    # Project overview
-├── script.md                    # Full screenplay
-├── standard-library/            # ⭐ THE CRITICAL INNOVATION
-│   ├── characters/
-│   │   ├── protagonist.safetensors    # LoRA model
-│   │   ├── protagonist.json           # Metadata (training data, version)
-│   │   └── antagonist.safetensors
-│   ├── style/
-│   │   ├── art-direction.png          # Reference images
-│   │   ├── color-palette.json
-│   │   └── lighting-guide.md
-│   ├── prompts/
-│   │   └── templates.json             # Standardized prompt structures
-│   ├── controlnets/
-│   │   └── character-rig.zip          # 3D skeletal controls
-│   └── voices/
-│       ├── protagonist-voice.model
-│       └── antagonist-voice.model
-├── segments/
-│   ├── 001-opening/
-│   │   ├── segment.md                 # Script + requirements
-│   │   ├── segment.json               # Metadata (selected Clip NFT pointer)
-│   │   └── submissions/
-│   │       ├── 0xabc-clip.json        # Clip NFT metadata
-│   │       ├── 0xdef-clip.json
-│   │       └── ...
-│   ├── 002-introduction/
-│   │   └── ...
-│   └── ...
-├── assets/
-│   ├── props/
-│   ├── locations/
-│   └── music/
-└── governance/
-    ├── markets.json                   # Shot Market records
-    └── treasury.json                  # Revenue distribution config
+SelectionWeight(clip_c) = √(CreatorBond_c) + Σ_backers √(v_i_c)
 ```
 
-### 2.2 The Standard Library (Solving Consistency)
+The square root transformation ensures that broad community support outweighs concentrated capital:
 
-**The Innovation**: Every film **must** include an official dependency package before accepting contributions.
+| Scenario | Total Valuation | Quadratic SelectionWeight |
+|----------|----------------|---------------------------|
+| 1 whale values Clip A at 10,000 USDC | 10,000 | √10,000 = **100** |
+| 100 people each value Clip B at 100 USDC | 10,000 | 100 × √100 = **1,000** |
+| 25 people each value Clip C at 400 USDC | 10,000 | 25 × √400 = **500** |
 
-#### What's Included
+With identical total valuation, Clip B (100 backers) has 10x the weight of Clip A (1 whale). The clip with the broadest genuine community support wins.
 
-**1. Character LoRA Models**  
-Pre-trained Stable Diffusion/Video LoRAs for all main characters, ensuring consistent facial features across all submissions.
+**Key advantage**: Because backers value ALL clips (not just one), they pay only their stated valuation for whichever clip wins. If they valued the winner at zero, they pay nothing. There is no punitive “backing a loser” penalty — excess deposits are refunded in full. This encourages participation and honest preference revelation.
 
-**2. Art Style References**  
-- Color palette definitions
-- Lighting guides (e.g., “noir high-contrast” vs. “bright natural”)
-- Cinematography references (lens choices, camera angles)
+After resolution, funds are distributed deterministically:
 
-**3. Prompt Templates**  
-Standardized structures that contributors must follow:
-```json
-{
-  "character_shot": "[PROTAGONIST_LORA] in [LOCATION], [ACTION], cinematic lighting, [STYLE_TOKENS]",
-  "environment_shot": "[LOCATION_DESCRIPTION], [STYLE_TOKENS], establishing shot"
-}
+- **Backer payments**: Each backer pays their stated valuation for the winning clip (v_i_winner). Excess deposit (deposit - v_i_winner) is refunded immediately. The payment is recorded as their streaming revenue stake.
+- **Competition Tax**: 5% of losing Creator Bonds flow to the Film Treasury.
+- **Loser Creator Refund**: 75% of losing Creator Bonds are returned to losing creators.
+- **Reward Pool**: 20% of losing Creator Bonds are split between the winning creator (50%) and winning backers (50%, proportional to √(v_i_winner)).
+- **Winning Creator Bond**: Returned in full.
+
+This creates aligned incentives across all participants. Creators compete on quality because winning returns their bond plus a reward pool share plus ongoing streaming revenue. Backers submit truthful valuations because the menu auction’s truthful equilibrium makes honest menus the dominant strategy — overstating wastes capital, understating reduces streaming revenue stake.
+
+### 2.5 Innovation Four: NFT-Driven Economics (Fair Distribution)
+
+Every economic relationship in OpenMontage is encoded in transferable, auditable, on-chain assets:
+
+**Clip NFTs (ERC-721)** represent authorship of individual video segments. Each Clip NFT records the creator’s wallet, the video’s IPFS hash, the Standard Library version used, and the clip’s current status (merged or archived). Merged clips earn streaming revenue continuously while they remain in the Main Branch. Archived clips retain their NFT provenance — historical record of contribution — but do not earn ongoing revenue.
+
+**Film NFTs (ERC-721)** represent the film as a composite creative work. Minted when a director pays the Film Creation Bond, the Film NFT carries copyright claim, 10% of ongoing streaming revenue, and governance authority over the film’s parameters. It is fully transferable — a director can sell their film and its revenue stream to another party.
+
+**Film Ticket NFTs** are optional crowdfunding instruments. Directors can issue limited-supply tickets that grant holders lifetime streaming access and a revenue share drawn from the creator pool (reducing it from 75% to 65%, with the 10% difference flowing to Ticket NFT holders). The Film NFT holder’s 10% share is unaffected by Film Ticket NFTs.
+
+Revenue distribution across all these assets is automated by the Treasury smart contract, requiring no manual intervention:
+
+```
+Standard Split (no Film Ticket NFTs):
+  Clip Creators:              75%  (proportional to screen time)
+  Film NFT Holder (Director): 10%
+  Standard Library Contrib.:   5%
+  Clip Backers Pool:          10%  (proportional to stake in merged clips)
+
+Modified Split (with Film Ticket NFTs):
+  Clip Creators:              65%  (reduced by 10pp to fund Ticket holders)
+  Film NFT Holder (Director): 10%  (unchanged)
+  Standard Library Contrib.:   5%  (unchanged)
+  Clip Backers Pool:          10%  (unchanged)
+  Film Ticket NFT Holders:    10%
 ```
 
-**4. ControlNet Specifications**  
-3D skeletal rigs or pose control networks for character animation consistency.
-
-**5. Voice Clone Models**  
-Authorized TTS models for each character to maintain audio coherence.
-
-#### Why This Matters
-
-**Without Standard Library**: 10 creators generate 10 versions of the protagonist with different faces, hair, clothing → unusable.
-
-**With Standard Library**: All 10 creators pull the same protagonist LoRA → perfect consistency, community votes on best execution.
-
-**Analogy**: Like npm dependencies ensuring JavaScript libraries work together, Standard Library ensures video segments visually integrate.
-
 ---
 
-## 3. Workflow & Roles
+## 3. Participant Roles and Experience
 
-### 3.1 Film Initiator (Director/Producer)
+### 3.1 Directors and Film Initiators
 
-**Responsibilities**:
-1. Upload screenplay and decompose into Scenes/Shots
-2. **Build Standard Library**:
-   - Train character LoRAs using reference images/videos
-   - Define art style and create prompt templates
-   - Document technical requirements (resolution, frame rate, format)
-3. Set up Treasury smart contract for revenue distribution
-4. (Optional) Launch Film Ticket NFT crowdfunding campaign
+Directors are the architects of OpenMontage films. They define the creative vision, build the infrastructure that makes collaboration possible, and earn 10% of all streaming revenue as Film NFT holders.
 
-**Rewards**: 10% of all film revenue (as Film NFT holder).
+**What Directors Do**:
+- Decompose a screenplay into Shots with clear descriptions, duration targets, and technical requirements
+- Build the Standard Library — training character LoRA models, defining art direction, creating prompt templates, recording voice clone models
+- Pay the Film Creation Bond (minimum 500 USDC; recommended 50 USDC per planned shot). 50% seeds the Film Treasury for infrastructure costs; 50% is held in Completion Escrow and refunded when 80% of shots have a merged clip
+- Set competition parameters: submission window duration, minimum quality thresholds, Standard Library version requirements
+- Optionally issue Film Ticket NFTs to crowdfund production capital before shots are filled
 
----
+**Director Constraints**: Directors cannot submit valuation menus in their own film’s Shot Markets. This conflict-of-interest prohibition is enforced at the smart contract level — the `ShotMarket.commitBacking()` function rejects transactions from the Film NFT holder’s address.
 
-### 3.2 Contributors (AIGC Creators)
+**Director Economics**: A completed film earning $50,000/month in streaming revenue generates $4,850/month for the Film NFT holder after the 3% platform fee, indefinitely. Directors who build high-quality Standard Libraries attract better contributors, which produces higher-quality films, which attracts larger audiences — a reinforcing loop.
 
-**Workflow**:
+### 3.2 AIGC Creators
 
-1. **Browse & Claim**  
-   Browse available Shots in film repositories, claim one to work on.
+Creators are the contributors who generate video segments. They are the primary revenue earners on the platform, receiving 75% of all streaming revenue proportional to their merged clip’s screen time.
 
-2. **Pull Dependencies**  
-   Download Standard Library (LoRAs, style guides, ControlNets, prompts).
+**What Creators Do**:
+- Browse film repositories to find shots that match their skills and interests
+- Download the film’s Standard Library assets via the platform
+- Generate video segments using AI tools, loading character LoRAs, following prompt templates, applying ControlNet constraints
+- Submit clips with a 50 USDC Creator Bond, entering them into Shot Market menu auctions
+- Optionally improve and resubmit if their clip is challenged by a successor
 
-3. **Generate Video**  
-   Use AI tools (Sora, Runway, ComfyUI, etc.) with Standard Library assets:
-   - Load character LoRAs into generation pipeline
-   - Follow prompt templates
-   - Apply ControlNet constraints if provided
-   - Use official voice models for dialogue
+**Creator Economics**: A creator with a 2-minute merged clip in a film earning $50,000/month earns approximately $808/month in passive streaming revenue — while the clip remains in the Main Branch. The Creator Bond is returned in full if the clip wins; 75% is refunded if it loses, meaning net downside is 12.50 USDC plus compute costs. A creator who wins one in three competitions is profitable from streaming revenue alone within the first month.
 
-4. **Submit Pull Request**  
-   Upload video + metadata to segment's submission pool:
-   - Video file hash (IPFS/Arweave)
-   - Generation method (AI model, parameters)
-   - Standard Library version used
-   - Creator wallet address
+Creators can accumulate a portfolio of merged clips across multiple films, compounding their passive income. A creator with three merged clips in a $50,000/month film earns approximately $600+/month from that film alone.
 
-5. **Minting**  
-   Submission automatically minted as **Clip NFT** with:
-   - Immutable authorship proof
-   - Technical metadata
-   - Pointer to video file
-
-**Rewards**: 75% of film revenue distributed proportionally by screen time while in Main Branch.
-
----
+**Replacement Risk**: Merged clips can be challenged by superior submissions. Challengers pay 100 USDC (double the Creator Bond), and the incumbent clip starts with a synthetic SelectionWeight advantage equal to 50% of its original winning weight. Backers submit binary valuation menus (incumbent vs. challenger). Incumbents are notified and given a 7-day response window to improve their submission at no additional cost. A 21-day cooldown prevents harassment through repeated challenges. **Challenge outcomes**: If the challenger wins, the incumbent clip is archived and the challenger’s clip replaces it in the Main Branch. If the incumbent wins, the challenger receives a 75% refund of their Challenge Bond (losing 25 USDC), and the incumbent earns a defense bonus from the Reward Pool.
 
 ### 3.3 Backers
 
-**Role**: Stake USDC in Shot Competition Markets to back clips they believe will win.
+Backers are quality curators. They submit sealed valuation menus expressing preferences across ALL competing clips in each Shot Market auction, earning returns from streaming revenue proportional to their valuations for winning clips.
 
-**How They Earn**:
-- **Competition payout**: Winning backers receive their full stake back plus a share of the Reward Pool (funded by 20% of losing stakes)
-- **Ongoing streaming revenue**: 10% of film streaming revenue is allocated to backers of currently-merged clips, proportional to their stake
+**What Backers Do**:
+- Evaluate all submitted clips for a given Shot during the submission phase
+- During the commit phase, construct a valuation menu covering all clips and deposit USDC equal to their highest valuation (10-5,000 USDC range)
+- During the reveal phase, reveal their full valuation menu to the contract
+- Claim competition payouts and ongoing streaming revenue after auction resolution
 
-**Selection**: The clip with the highest quadratic-weighted backing wins — `BackingWeight = Σ √(deposit_i)` across all backers, plus `√(CreatorBond)` for the creator's own stake. Note: The clip creator's submission stake (min 50 USDC) is automatically counted as their initial backing deposit in the formula. This ensures broad community support outweighs concentrated capital.
+**Backer Economics**: Backers pay only their stated valuation for the winning clip — excess deposits are refunded in full. Their payment is recorded as a streaming revenue stake: 10% of the Film Treasury’s revenue flows to backers of currently-merged clips, proportional to their valuation-based stake. Backers also share in the Reward Pool (50% of 20% of losing Creator Bonds, proportional to sqrt(valuation) for the winning clip). A backer with winning positions across 20 clips in five films earns meaningful passive income that compounds over time.
 
-**Risk**: Losing backers receive a 75% refund of their stake (lose 25%).
+There is no punitive “backing a loser” penalty. Backers who valued the winning clip at zero pay nothing and receive their full deposit back. The expected value of participation is positive for backers who can accurately assess clip quality — truthful valuations are the dominant strategy in the menu auction’s equilibrium.
 
----
+**Anti-Gaming Protections**: The sealed menu commit-reveal protocol ensures backers cannot see others’ valuations during the commit phase, eliminating bandwagoning. The 10 USDC minimum deposit prevents near-zero-cost Sybil attacks. The 5,000 USDC maximum deposit caps single-address influence. The 7-day minimum wallet age requirement adds friction for freshly created wallets. Quadratic weighting on valuations ensures crowd consensus beats capital concentration.
 
 ### 3.4 Audience
 
-**Experience**:
-- Stream films via platform frontend
-- Videos dynamically assembled from current Main Branch segments
-- Attribution displayed for all creators
-- Optional: Purchase Film Ticket NFTs for lifetime access + fractional Film NFT revenue rights
+Audiences experience OpenMontage films as dynamically assembled streaming content. The platform’s video assembly engine reads the current film manifest — an ordered list of merged Clip NFTs — and stitches segments into a seamless stream with fade transitions. Creator attribution is displayed throughout.
+
+**Audience Participation Options**:
+- Stream films via the web platform or mobile app
+- Purchase Film Ticket NFTs for lifetime access and fractional revenue participation
+- Observe Shot Market auction results to understand which clips were selected and why
+- As the platform matures, use the dispute resolution system to flag technically invalid market outcomes
+
+The audience represents OpenMontage’s revenue foundation. Every stream, advertisement impression, and licensing deal flows into the Treasury smart contract and distributes automatically to creators, backers, directors, and Standard Library contributors. More audience engagement means more revenue for all contributors — aligning every participant’s incentive toward film quality.
 
 ---
 
-## 4. Economic Model (Tokenomics)
+## 4. Economic Model Overview
 
-### 4.1 NFT-Based Ownership
+### 4.1 NFT Asset System
 
-#### Clip NFT (Segment Ownership)
-Every submission is minted as an ERC-721 NFT containing:
-```json
-{
-  "clip_id": "0xabc...",
-  "film_id": "space-odyssey-2077",
-  "shot_id": "042",
-  "creator": "0x123...",
-  "timestamp": "2026-02-24T15:30:00Z",
-  "video_hash": "QmXyZ...",
-  "standard_library_version": "1.2.0",
-  "generation_method": "Runway Gen-3 + character LoRA",
-  "duration": 8.5,
-  "creator_bond": 50,
-  "status": "merged" | "archived"
-}
+OpenMontage’s economic model is built on three layers of NFT assets:
+
+**Clip NFTs** are the atomic unit of contribution. Each video segment submitted to a Shot Market is minted as an ERC-721 NFT with immutable authorship metadata, the video’s IPFS hash, the Standard Library version used, and status tracking (merged or archived). Merged Clip NFTs earn streaming revenue continuously. Creators retain a 10% perpetual royalty on secondary market sales of their Clip NFTs. The NFT marketplace enables price discovery for high-value clips in successful films.
+
+**Film NFTs** are the composite creative asset. The Film NFT is a dynamic pointer array — a manifest that references the currently-merged Clip NFT for each Shot, updating as menu auctions resolve. Beyond the manifest function, the Film NFT carries copyright claim over the composite work, 10% of all streaming revenue, and governance authority over film parameters. Full transferability means directors can realize the value of a successful film by selling the Film NFT along with its revenue stream.
+
+**Film Ticket NFTs** are crowdfunding instruments. By issuing a limited supply of tickets (e.g., 10,000 tickets at 50 USDC each), directors can raise production capital before or during the filmmaking process. Ticket holders receive lifetime streaming access and 10% of film revenue drawn from the creator pool. This mechanism enables community-funded production at a scale previously requiring traditional financing.
+
+### 4.2 Shot Market Menu Auctions: The Core Mechanism
+
+The Shot Market Menu Auction is OpenMontage’s central quality selection mechanism. Adapted from the Bernheim-Whinston (1986) menu auction framework, it replaces single-clip backing with sealed valuation menus, producing efficient outcomes under the quadratic-weighted objective in truthful equilibrium.
+
+The complete auction lifecycle:
+
+```
+SUBMISSION PHASE (14 days)
+  Creators submit clips + 50 USDC Creator Bond
+  Clips minted as Clip NFTs, enter competition
+  Auction phase opens once >= 2 submissions exist
+          |
+          v
+COMMIT PHASE (5 days)
+  Backers submit: keccak256(clipId_1, v_1, ..., clipId_N, v_N, salt)
+  Deposit = max(v_i) locked in contract
+  Only commitment counts visible — valuations and preferences hidden until reveal
+          |
+          v
+REVEAL PHASE (2 days)
+  Backers reveal: full valuation menu + salt
+  Contract verifies hash match and max(valuations) <= deposit
+  Non-reveals forfeit deposit to reward pool
+          |
+          v
+RESOLUTION
+  SelectionWeight(clip_c) = sqrt(CreatorBond_c) + sum_backers sqrt(v_i_c)
+  Highest weight wins
+  Payouts distributed deterministically
 ```
 
-**Properties**:
-- Tradeable on NFT marketplaces
-- Earns revenue only when `status: "merged"`
-- Creator retains 10% perpetual royalty on secondary sales
-- Upon minting, the clip enters the **Shot Competition Market** where community members back it with real capital (see Section 4.4)
+The payout structure maintains full conservation — every USDC deposited is accounted for:
 
-#### Film NFT (Film Ownership)
-The Film NFT (ERC-721) represents the film as a composite creative work. It is minted when a director pays a **Film Creation Bond** (minimum 500 USDC), a refundable deposit that signals commitment and seeds the film's treasury.
+```
+Backer settlements:
+  Each backer pays v_i_winner (their valuation for the winning clip)
+  Excess refund: deposit - v_i_winner (returned immediately)
+  Payment recorded as streaming revenue stake
 
-```json
-{
-  "film_nft": "0xdef...",
-  "title": "Space Odyssey 2077",
-  "director": "0x123...",
-  "creation_bond": 10000,
-  "bond_status": "partially_refunded",
-  "standard_library_version": "1.2.0",
-  "total_shots": 200,
-  "merged_shots": 180,
-  "segments": [
-    {"shot_id": "001", "clip_nft": "0xabc...", "creator": "0x456...", "duration": 8.5},
-    {"shot_id": "002", "clip_nft": "0xfgh...", "creator": "0x789...", "duration": 12.3}
-  ],
-  "total_runtime": 5400,
-  "last_updated": "2026-06-15T14:30:00Z"
-}
+From losing Creator Bonds (CB_l):
+  Competition Tax:  5% * CB_l   ->  Film Treasury
+  Loser Refunds:   75% * CB_l   ->  returned to losing creators
+  Reward Pool:     20% * CB_l   ->  50% to winning creator, 50% to winning backers
+
+Winning Creator Bond: returned in full
+
+Total Out = all deposits accounted for (funds conserved exactly)
 ```
 
-**What the Film NFT Represents**:
-- **Copyright claim**: The holder asserts creative direction / copyright over the composite work
-- **Revenue rights**: 10% of ongoing streaming revenue (the “Director Share”)
-- **Governance authority**: Set film parameters (shot count, competition timing, quality thresholds, Standard Library versions)
-- **Dynamic pointer array**: Contains references to all currently-merged Clip NFTs — updates when Shot Market competitions replace segments
+### 4.3 Revenue Distribution: The 75/10/5/10 Split
 
-**Film Creation Bond Allocation**:
+All revenue generated by a film — streaming fees, advertising, licensing, Film Ticket NFT sales, Shot Market competition taxes — flows into the Treasury smart contract and is distributed automatically on every settlement cycle. Backer valuations for winning clips are recorded as their streaming revenue stakes.
 
-| Portion | % | Purpose |
-|---------|---|---------|
-| Film Treasury Seed | 50% | Funds initial infrastructure (Standard Library hosting, CDN, IPFS pinning) |
-| Completion Escrow | 50% | Locked, refundable to director upon film completion (≥80% shots merged) |
+The standard distribution split:
 
-**Transferability**: The Film NFT is fully transferable. A director can sell their film (and its associated revenue stream) to another party. The new holder inherits all director rights and the 10% revenue share.
+| Stakeholder | Share | Distribution Logic |
+|-------------|-------|--------------------|
+| Clip Creators | 75% | Proportional to screen time: `Creator_Earnings = CreatorPool * (Clip_Duration / Total_Film_Duration)` |
+| Film NFT Holder | 10% | Fixed share to the current Film NFT holder (the director or whoever holds it) |
+| Standard Library Contributors | 5% | Split among contributors who built the film’s Standard Library assets |
+| Clip Backers Pool | 10% | Proportional to valuation-based stake in merged clips, weighted by screen time |
 
-#### Backing Positions
-Community members participate in Shot Markets by **backing** clips they believe are best with USDC. Backing positions are not separate NFTs but are recorded on-chain within the ShotMarket contract. Backers of the winning clip earn:
-- **Competition payout**: A share of the reward pool from losing stakes (one-time)
-- **Ongoing streaming revenue**: 10% of the film's treasury revenue is allocated to backers of currently-merged clips, proportional to their stake
+When Film Ticket NFTs are issued, the creator pool adjusts from 75% to 65%, with the 10% difference flowing to Ticket NFT holders. All other shares remain unchanged.
 
-Backing positions are tied to the merged clip — if a clip is replaced via a challenge, the original backers' streaming revenue stops and new backers begin earning.
+**Illustrative Example** — 90-minute film, $50,000/month revenue, 3% platform fee:
+
+```
+Treasury Revenue = $50,000 * 0.97 = $48,500/month
+
+Film NFT Holder (Director):      $48,500 * 10%  = $4,850/month
+Standard Library Contributors:   $48,500 * 5%   = $2,425/month
+Clip Backers Pool:                $48,500 * 10%  = $4,850/month
+Clip Creator Pool:                $48,500 * 75%  = $36,375/month
+
+  Creator A (3 clips, 5 min total):   $36,375 * (300/5400) = $2,021/month
+  Creator B (1 clip, 30 seconds):     $36,375 * (30/5400)  = $202/month
+```
+
+Earnings are passive and continuous. A merged clip earns every month it remains in the Main Branch, indefinitely.
+
+### 4.4 The $MONTAGE Token: Platform Governance
+
+$MONTAGE is OpenMontage’s platform governance token. It plays no role in film-level clip selection — that is handled entirely by USDC-denominated menu auctions. This separation is by design: film quality decisions should be driven by honest valuation menus from the community, not by accumulated token holdings.
+
+**$MONTAGE use cases:**
+
+- **Platform governance**: Token holders vote on platform fee changes, contract upgrades, treasury allocation, grant programs, and feature prioritization. Proposals require 4% quorum of circulating supply and a simple majority; contract upgrades require 67% supermajority.
+- **Fee reduction**: Staking $MONTAGE reduces the effective Competition Tax rate from 5% down to a minimum of 2%, proportional to stake size.
+- **Value accrual**: 80% of platform fees are used to buy back and burn $MONTAGE on the open market each quarter, creating deflationary pressure as platform revenue grows.
+- **Access**: Priority access to premium Standard Library tools and new platform features.
+
+**Total supply**: 1,000,000,000 $MONTAGE. Initial circulating supply at TGE (Q1 2027): approximately 8%. Allocation: 30% community rewards (5-year vest), 20% ecosystem grants (3-year vest), 15% team and advisors (4-year vest, 1-year cliff), 15% treasury reserve, 10% public sale, 7% seed and strategic, 3% liquidity provision.
 
 ---
 
-### 4.2 Revenue Sources
+## 5. Technical Architecture Overview
 
-1. **Pay-Per-View**: Audience streaming fees
-2. **Advertising**: Platform ad revenue share
-3. **Film Ticket NFTs**: Crowdfunding + lifetime access
-4. **Copyright Licensing**: Studio/platform distribution deals
-5. **Merchandise**: Official merch tied to NFT holders
-6. **Shot Market Competition Fees**: 5% competition tax on losing stakes from all Shot Markets
+### 5.1 System Layers
 
-All revenue flows into **Treasury Smart Contract** for automated distribution.
+OpenMontage is organized into four layers, each with clearly defined responsibilities:
+
+```
+APPLICATION LAYER
+  Frontend (web, mobile, Discord bot)
+  Film browsing, submission management,
+  Menu Auction interface, wallet integration
+          |
+          v
+API LAYER
+  User authentication, video assembly engine
+  Metadata indexing, search and discovery
+  Revenue dashboard, Standard Library distribution
+          |
+     |         |
+     v         v
+BLOCKCHAIN      STORAGE
+LAYER           LAYER
+Smart contracts  IPFS / Arweave (video files, permanent)
+NFT minting      Cloud CDN (delivery, adaptive bitrate)
+Menu Auctions   Git LFS (Standard Library assets, LoRAs)
+Treasury         Metadata indexing (The Graph subgraph)
+```
+
+### 5.2 Blockchain Layer: Base L2
+
+OpenMontage deploys on **Base**, Coinbase’s Ethereum L2 rollup (OP Stack), as the primary chain. The rationale:
+
+- **Sub-cent transaction costs** — NFT minting, menu auction commits, reveals, and payouts are economically viable at Base’s fee level. On Ethereum mainnet, these operations would be prohibitively expensive.
+- **Creator ecosystem alignment** — Base hosts the largest on-chain creator community, including Zora and other creator-native platforms. OpenMontage’s target contributors already exist here.
+- **Coinbase fiat onramp** — Filmmakers and audiences unfamiliar with crypto can purchase USDC and interact with the platform without navigating complex exchange flows.
+- **Ethereum security** — Base inherits Ethereum’s security guarantees as a rollup; all state is periodically posted to Ethereum mainnet.
+- **EVM compatibility** — Standard Solidity tooling (Hardhat, Foundry, OpenZeppelin) and contract portability.
+
+**Fallback**: Arbitrum One is designated as the secondary deployment target. Both Base and Arbitrum are EVM-compatible rollups, so contract migration requires minimal changes if Base conditions change.
+
+**Core smart contracts:**
+
+| Contract | Responsibility |
+|----------|---------------|
+| `ClipNFT.sol` | ERC-721 for segment ownership; backer registry; Standard Library compliance validation |
+| `FilmNFT.sol` | Film copyright, revenue rights, Film Creation Bond management, dynamic manifest |
+| `Treasury.sol` | Automated 75/10/5/10 revenue distribution; Competition Tax collection; buyback |
+| `ShotMarket.sol` | Submission, sealed menu commit-reveal, quadratic SelectionWeight resolution, payouts |
+| `StandardLibrary.sol` | Asset versioning, dependency manifest, compliance verification |
+
+All contracts deploy behind OpenZeppelin TransparentProxy in Phase 1 to allow bug fixes during early operation. A 3-of-5 Gnosis Safe multi-sig (founding team, hardware wallets, geographically distributed) controls upgrades and emergency pause. Proxy admin authority transfers to the DAO Governor contract in Phase 3.
+
+Security: All core contracts undergo two independent audits (OpenZeppelin for ERC-721 compliance and access control; Trail of Bits for economic exploits and MEV risks) before mainnet deployment. Treasury.sol implements checks-effects-interactions pattern and OpenZeppelin ReentrancyGuard. Oracle-dependent revenue distributions use Chainlink Data Feeds with a 24-hour staleness check.
+
+### 5.3 Storage Layer
+
+**Video files** are stored on IPFS and Arweave for permanent, decentralized availability. The video’s content hash is recorded in the Clip NFT metadata, enabling any party to independently verify file integrity. Regional CDN edge nodes (Cloudflare, AWS CloudFront) cache popular content for low-latency streaming.
+
+**Standard Library assets** — LoRA models (.safetensors), ControlNet configurations, voice clone models — are distributed via Git LFS and CDN. File sizes for LoRA models range from 50MB to 300MB; CDN distribution is essential for global creator access.
+
+**Metadata indexing** is handled by a custom The Graph subgraph that indexes all on-chain events: clip submissions, market resolutions, revenue distributions, and Film NFT transfers. This powers the web dashboard and API layer without requiring full-node queries.
+
+**Real-time assembly**: The video playback engine reads the current Film NFT manifest, fetches each segment’s IPFS hash from the corresponding Clip NFT, and assembles an adaptive bitrate stream (HLS/DASH) with seamless transitions between shots.
+
+### 5.4 Discord-First Strategy
+
+Rather than building a full web application before validating the core product loop, OpenMontage launches Phase 1 as a **Discord-first platform**. Discord is where AI creator communities and crypto-native communities already operate. Meeting users in their existing environment eliminates onboarding friction and enables a usable product to ship in weeks rather than months.
+
+The Discord bot (MontageBot) translates user commands into smart contract interactions:
+
+| Command | Action |
+|---------|--------|
+| `/create-film` | Director initiates film, pays Film Creation Bond, Film NFT minted |
+| `/claim-shot film:[id] shot:[id]` | Creator claims a shot for 72-hour exclusive work window |
+| `/submit film:[id] shot:[id] url:[url]` | Uploads video to IPFS, mints Clip NFT, pays 50 USDC Creator Bond |
+| `/back-shot film:[id] shot:[id] deposit:[USDC] rank:[clipA,clipB,...]` | Submits sealed valuation menu (rank-based shortcut), locks deposit |
+| `/back-shot-menu film:[id] shot:[id] deposit:[USDC] values:[clipA:v1,...]` | Submits sealed valuation menu (explicit valuations) |
+| `/reveal-backing film:[id] shot:[id] salt:[secret]` | Reveals full valuation menu during reveal phase |
+| `/claim-market film:[id] shot:[id]` | Claims winner reward or loser refund after resolution |
+| `/standard-library film:[id]` | Downloads Standard Library assets from CDN |
+| `/my-earnings` | Displays streaming revenue and competition rewards |
+
+The transition from Discord-first to a full web application follows the roadmap phases. By Phase 3, Discord transitions to a notification and community role while the standalone web app handles all workflows.
 
 ---
 
-### 4.3 Revenue Distribution
+## 6. Governance Framework Overview
 
-**Smart Contract Formula**:
+### 6.1 Two-Layer Governance Separation
 
-```
-TreasuryRevenue = TotalRevenue - PlatformFee (2-5%)
+OpenMontage enforces a strict separation between film-level governance and platform-level governance. These are fundamentally different decisions requiring different participants, different mechanisms, and different timelines.
 
-FilmNFT_Share = TreasuryRevenue × 10%     // Director / Film NFT holder
-StdLib_Share  = TreasuryRevenue × 5%      // Standard Library contributors
-Backer_Pool   = TreasuryRevenue × 10%     // Backers of merged clips
-Creator_Pool  = TreasuryRevenue × 75%     // Clip creators
+**Film-Level Governance — Menu Auction Shot Markets**
 
-// Creator earnings by screen time
-Creator_Earnings = Creator_Pool × (Clip_Duration / Total_Film_Duration)
+Clip selection for each Shot is determined by menu auctions, not by any voting process. Backers submit sealed valuation menus expressing preferences across all competing clips; the clip with the highest aggregate quadratic-weighted SelectionWeight wins. Directors cannot override auction outcomes; the contract result is final (subject to a structured dispute resolution process involving a randomly selected jury of high-reputation backers).
 
-// Backer earnings proportional to their backing of merged clips
-Backer_Earnings = Backer_Pool × (Clip_Duration / Total_Film_Duration) × (Backer_Deposit / Total_Winner_Backer_Deposits)
-```
+This design means film quality decisions are purely meritocratic — the clip that best convinces the broadest community of backers wins, independent of who produced it, who the director favors, or how much capital any single actor controls. The menu auction’s truthful equilibrium guarantees that honest valuations are the dominant strategy.
 
-**Example** (90-minute film, $50,000/month revenue, 3% platform fee):
+**Platform-Level Governance — $MONTAGE Token Voting**
 
-Treasury revenue = $50,000 × 0.97 = **$48,500/month**
+Platform governance controls the OpenMontage protocol itself: fee structures, contract upgrades, treasury allocation, feature prioritization, grant programs. $MONTAGE token holders vote on these decisions through a structured proposal process: 7-day community discussion, off-chain signal vote on Snapshot, on-chain vote with 4% quorum and simple majority (67% supermajority for contract upgrades and large treasury allocations).
 
-| Stakeholder | Calculation | Monthly Earnings |
-|-------------|-------------|------------------|
-| Film NFT Holder (Director) | $48,500 × 10% | $4,850 |
-| Standard Library Contributors | $48,500 × 5% | $2,425 |
-| Backer Pool (all merged-clip backers) | $48,500 × 10% | $4,850 |
-| Creator A (3 segments, 5 min total) | $36,375 × (5/90) | $2,021 |
-| Creator B (1 segment, 30 sec) | $36,375 × (0.5/90) | $202 |
+The separation is enforced structurally. A $MONTAGE whale cannot influence which clip wins a menu auction. An individual film contributor cannot unilaterally change platform economics. These concerns are handled by different mechanisms operating independently.
 
-**Key Feature**: Earnings flow continuously while segment remains in Main Branch — passive income for both creators and backers.
+### 6.2 Progressive Decentralization
 
----
+OpenMontage does not launch as a fully decentralized DAO. Early-stage protocols require the ability to respond quickly to bugs, exploits, and market feedback. Authority decentralizes in deliberate phases:
 
-### 4.4 Shot Competition Markets
+**Phase 1 (Q2-Q3 2026)**: 3-of-5 founding team multi-sig controls platform operations. Menu auctions operate autonomously for film-level decisions. Community advisory votes via Discord polls are non-binding. All multi-sig actions are logged publicly.
 
-Shot Markets are the central mechanism for selecting the best clip for each shot. Each shot in a film becomes a **bounded prediction market** where participants back the clip they believe is best with real capital.
+**Phase 2 (Q4 2026)**: Platform governance proposals via $MONTAGE token-weighted voting for fee structures and feature priorities. Menu auctions handle all film-level clip selection independently. Multi-sig retained for emergency actions.
 
-#### Shot Market Lifecycle
+**Phase 3 (2027)**: On-chain Governor contract for all platform governance. Multi-sig retained only for emergency pause, with authority transferring to DAO via fast-track voting mechanism. Film-level governance via menu auctions continues unchanged.
 
-```
-┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
-│  SUBMISSION       │────▶│  BACKING          │────▶│  RESOLUTION      │
-│  PHASE            │     │  PHASE            │     │                  │
-│  (14 days)        │     │  (7 days)         │     │  Winner          │
-│                   │     │                   │     │  determined by   │
-│  Creators submit  │     │  Community backs  │     │  highest         │
-│  clips + stake    │     │  clips with USDC  │     │  quadratic       │
-│  Creator Bond     │     │  (blind commit-   │     │  backing weight  │
-│  (50 USDC)        │     │   reveal)         │     │                  │
-└──────────────────┘     └──────────────────┘     └──────────────────┘
-```
+**Phase 4 (2028+)**: Constitutional governance with ratified charter, on-chain dispute courts, elected governance council, and formal separation of executive, legislative, and judicial functions. Constitutional amendments require 75% supermajority and 30-day deliberation.
 
-**Submission Phase** (14 days, configurable by director):
-1. Creator generates a video segment using the film's Standard Library
-2. Creator submits the clip with a **Creator Bond** of 50 USDC
-3. The clip is minted as a Clip NFT and enters the competition
-4. Backing phase opens once ≥2 submissions exist
-
-**Backing Phase — Blind Commit-Reveal** (7 days):
-- **Commit Period (5 days)**: Backers evaluate clips, then commit `keccak256(clipId, amount, salt)` with their USDC deposit locked. Neither the chosen clip nor the amount is visible to others.
-- **Reveal Period (2 days)**: Backers reveal their commitments. Non-reveals forfeit their deposit to the reward pool.
-- Minimum backing: 10 USDC per backer per clip
-- Maximum backing: 5,000 USDC per backer per clip
-- A backer **cannot** back multiple clips in the same shot (forces conviction)
-
-**Winner Determination — Quadratic Backing Weight**:
-
-```
-BackingWeight(clip_j) = Σ_i √(deposit_i)    for all backers i who backed clip j
-                      + √(CreatorBond_j)      creator's own bond counts
-```
-
-Quadratic weighting ensures **breadth of support matters more than depth of capital**:
-
-| Scenario | Raw Total | Quadratic Weight |
-|----------|-----------|----------------|
-| 1 whale backs Clip A with 10,000 USDC | 10,000 | √10,000 = **100** |
-| 100 people back Clip B with 100 USDC each | 10,000 | 100 × √100 = **1,000** |
-
-The clip with 100 backers has **10× the weight** of the single whale — crowd consensus wins.
-
-#### Payout Structure
-
-After resolution, payouts are calculated:
-
-- **Competition Tax**: 5% of losing deposits → Film Treasury
-- **Loser Refund**: 75% of losing deposits → returned to losers
-- **Reward Pool**: 20% of losing deposits → split between winning creator (50%) and winning backers (50%)
-- **Winner deposits**: Returned in full
-
-**Example** — Shot 042 with 3 clips, Clip A wins:
-
-| Clip | Creator Bond | Backers | Total Deposited | Quadratic Weight |
-|------|-------------|---------|-----------------|----------------|
-| **Clip A (Winner)** | 50 USDC | 30 backers, avg 40 USDC | 1,250 USDC | **196.81** |
-| Clip B (Loser) | 50 USDC | 15 backers, avg 30 USDC | 500 USDC | 89.23 |
-| Clip C (Loser) | 50 USDC | 8 backers, avg 25 USDC | 250 USDC | 47.07 |
-
-Losing deposits: 750 USDC → Tax: 37.50 | Refund: 562.50 | Reward Pool: 150 USDC
-- **Winning Creator A**: 50 (bond back) + 75 (reward) = **125 USDC** (150% ROI)
-- **Each Backer of A** (avg 40 USDC): 40 + ~2.50 = **42.50 USDC** (6.25% ROI)
-- **Losing creators/backers**: 75% of their deposits refunded (25% loss)
-
-#### Film Creation Bond
-
-To create a film, the director pays a **Film Creation Bond** (minimum 500 USDC, recommended 50 USDC × number of shots). The bond is split: 50% seeds the Film Treasury (infrastructure costs) and 50% is locked in Completion Escrow, refundable when ≥80% of declared shots have a merged clip.
-
-If no submissions or director activity occur for 90 consecutive days, the film is marked “Abandoned” — escrowed funds are distributed pro-rata to creators who submitted clips.
+**Standard Library Governance** occupies its own layer within film governance. Minor version updates (adding assets, fixing bugs) are at the director’s discretion. Major breaking changes (retraining character LoRAs, fundamental style shifts) require 70% approval from active contributors (defined as any wallet with at least one submission in the last 30 days) and a two-week migration period with backward compatibility guarantees.
 
 ---
 
-### 4.5 Iterative Competition & Replacement Challenges
+## 7. Use Cases
 
-Once a clip is merged, it can be replaced if a genuinely superior version appears. The replacement process uses the same Shot Market mechanism but with deliberate friction to protect incumbent creators.
+**Independent AI Films** — Original screenplays produced entirely through global contributor communities, earning streaming revenue indefinitely. The pilot film “Genesis” (20-minute sci-fi, 100 shots) serves as the proof of concept in Phase 1.
 
-**Challenge Process**:
+**Fan and Community Films** — Community-driven adaptations of public domain works (Shakespeare plays, mythology, historical events) with guaranteed visual consistency. Standard Library assets give such projects a professional, unified visual identity that fan films historically have lacked.
 
-1. **Challenger submits** a new clip for an already-merged shot
-2. **Challenge Bond**: 2× Creator Bond (100 USDC) — the higher barrier discourages frivolous challenges
-3. **Incumbent creator** is notified and has 7 days to respond with an improved version (at no additional cost)
-4. **Mini-Competition**: A compressed Shot Market opens (7-day submission + 5-day backing)
-5. **Incumbency Advantage**: The incumbent clip starts with a synthetic backing weight equal to 50% of its original winning weight
-6. **Resolution**: Same quadratic backing weight formula
+**Educational and Documentary Content** — Universities, edtech platforms, and documentary producers can crowdsource science explainer videos, historical recreations, or training materials shot-by-shot. Menu auctions ensure quality curation without editorial bottlenecks.
 
-**Challenge Outcomes**:
-- **Challenger wins**: Incumbent clip archived (revenue stops), challenger merged (revenue starts), Challenge Bond refunded + reward pool share
-- **Incumbent survives**: Challenger receives 75% refund of Challenge Bond (loses 25 USDC), incumbent receives 50% of the forfeited portion as a defense bonus
+**Music Videos** — Musicians with existing audiences can crowdfund visual production via Film Ticket NFTs, then open menu auctions for the video’s individual segments. The 75% creator revenue share means AI video artists earn proportionally to their contribution.
 
-**Challenge Cooldown**: After any challenge, the same shot cannot be challenged again for **21 days**.
-
-**Economic Effect**:
-
-- Continuous quality improvement (race to use latest AI models)
-- Meritocracy (earnings tied to on-screen presence, not tenure)
-- Film evolution (movies improve as technology advances)
-- Long-tail monetization (even older segments earn if they remain best)
-- Fair protection for incumbents via higher Challenge Bond and incumbency advantage
+**Brand and Corporate Content** — Organizations can commission modular video production through OpenMontage’s contributor marketplace, paying only for merged segments and retaining quality control through menu auction curation. The on-chain provenance trail provides auditable attribution for content compliance.
 
 ---
 
-## 5. Governance & Anti-Gaming
+## 8. Competitive Positioning
 
-### 5.1 Shot Market Mechanism
+OpenMontage occupies a unique intersection that no existing platform addresses: decentralized, crowdsourced AI filmmaking with enforced visual consistency and automated revenue sharing.
 
-OpenMontage replaces token-weighted voting with **Shot Markets** — prediction market-style competitions where community members stake real capital to back the clips they believe are best. This transforms passive opinion polling into active quality investment.
+| Platform | Category | Consistency Solution | Revenue to Creators | Iterative Improvement |
+|----------|----------|---------------------|--------------------|-----------------------|
+| **OpenMontage** | Crowdsourced AI Filmmaking | Mandatory Standard Library (LoRAs, style guides, ControlNets) | 75% streaming revenue, proportional to screen time | Menu auctions enable efficient clip selection (quadratic-weighted); films improve continuously |
+| Film.io / Decentralized Pictures | Film Financing DAO | None — funds traditional production | Not direct; grant-based | No — traditional fixed releases |
+| Runway / Sora / Pika | AI Video Generation Tools | Per-project style controls (no cross-creator enforcement) | None — tool vendors | No |
+| YouTube Collaborations | Ad-hoc creator collab | Manual coordination, often ignored | Ad revenue (platform takes 45%) | No formal mechanism |
+| Zora / Lens | Creator social platforms | None | Tips, trading fees | No |
+| Story Protocol | IP Infrastructure | None — infrastructure layer | Automated royalties (asset-level) | No |
 
-**Commit-Reveal Protocol**:
-1. **Commit Phase** (5 days): Backers submit `keccak256(clipId, amount, salt)` with USDC locked. Neither the chosen clip nor the backing amount is visible on-chain — only the commitment hash.
-2. **Reveal Phase** (2 days): Backers reveal their commitments. The contract verifies the hash matches. Non-reveals forfeit their deposit.
-3. **Resolution**: Quadratic backing weights are computed and the winning clip is determined.
+**Three structural advantages that cannot be easily replicated:**
 
-**Quadratic Weighting**:
-- `BackingWeight(clip) = Σ √(deposit_i)` for all backers of that clip
-- Ensures **breadth of support** (many backers) outweighs **depth of capital** (one whale)
-- 100 backers at 100 USDC each produce 10× the weight of one backer at 10,000 USDC
+1. **The only platform with a mandatory visual consistency system for AI-generated collaborative content.** The Standard Library concept is technically novel and becomes more defensible as each film’s library of LoRAs, ControlNets, and style assets accumulates into a unique creative artifact.
 
-**Winner Determination**:
-- Clip with the highest quadratic backing weight wins the shot
-- Winner is merged into the Main Branch and begins earning streaming revenue
-- Tie-breaking: Earlier submission wins (first-mover advantage)
+2. **The only streaming revenue model proportional to per-shot contribution.** Existing platforms distribute revenue at the film level to a small number of rights holders. OpenMontage distributes to every contributing creator proportionally to their screen time — enabling long-tail creator economics at scale.
 
-### 5.2 Anti-Gaming Measures
-
-**Commit-Reveal Prevents Bandwagoning and Sniping**:
-- Backings are hidden during the commit phase — backers cannot see which clip is “winning”
-- No last-minute capital dumps based on observed totals
-- Each backer must independently evaluate clip quality
-- The reveal phase produces genuine independent quality assessments
-
-**Quadratic Backing Prevents Whale Dominance**:
-- A single wealthy actor cannot guarantee a win by depositing a massive amount
-- `√(10,000)` = 100 weight, while `100 × √(100)` = 1,000 weight — the crowd wins 10:1
-- This makes the system “broadest consensus wins” rather than “highest bidder wins”
-
-**Minimum Stake Thresholds**:
-- Minimum 10 USDC per backing prevents near-zero-cost Sybil attacks
-- Creator Bond of 50 USDC per submission prevents spam submissions
-- Challenge Bond of 100 USDC (2× Creator Bond) discourages frivolous challenges
-- Wallet age requirement (7 days minimum) adds friction for newly created Sybil wallets
-
-**Cooldown Periods for Replacement Challenges**:
-- After any challenge (successful or not), the same shot cannot be challenged again for 21 days
-- Prevents harassment of incumbent creators through repeated challenges
-- Incumbent clips start with a synthetic 50% backing weight advantage in challenges
-
-**Quality Floors**:
-- Smart contract validates Standard Library compliance before clip submission
-- Technical spec enforcement (resolution, format, duration)
-- AI-powered consistency scoring (face recognition, style matching)
+3. **The only version-controlled film format.** Films on OpenMontage can improve over time as AI tools advance and new creators submit superior versions of existing shots. This is a structural advantage in an industry where AI model quality is improving by an order of magnitude per year.
 
 ---
 
-## 6. Technical Implementation
+## 9. Risk Analysis and Mitigations
 
-### 6.1 System Architecture
+### 9.1 Technical Risks
 
-```
-┌─────────────────────────────────────────────────────┐
-│              Frontend (Web/Mobile)                  │
-│  - Film browsing & streaming                        │
-│  - Submission management                            │
-│  - Shot Market interface                             │
-│  - Wallet integration                               │
-└────────────────┬────────────────────────────────┘
-                 │
-┌────────────────▼────────────────────────────────┐
-│            Application Layer (API)                  │
-│  - User authentication                              │
-│  - Video assembly engine                            │
-│  - Metadata indexing                                │
-│  - Search & discovery                               │
-└────────┬─────────────────────┬──────────────────────┘
-         │                       │
-┌────────▼────────┐     ┌──────▼────────────────────────┐
-│  Blockchain     │     │  Storage Layer             │
-│  - Smart        │     │  - IPFS/Arweave (videos)   │
-│    contracts    │     │  - Cloud CDN (delivery)    │
-│  - NFT minting  │     │  - Git repos (metadata)    │
-│  - Shot Market  │     │  - Standard Library CDN    │
-│  - Treasury     │     └────────────────────────────┘
-└─────────────────┘
-```
+**Visual Consistency at Scale** — Standard Library compliance validation relies on AI-powered similarity scoring (face recognition, style matching). These models may produce false positives or negatives. Mitigation: multi-layer validation combining automated scoring with human jury review for borderline cases; Standard Library v2.0 will expand automated validation tooling.
 
-> **Note**: Phase 1 uses Discord as the primary frontend (see Section 6.5). The web/mobile frontend replaces Discord in Phase 2-3.
+**Blockchain Dependence** — Platform availability depends on Base’s uptime and fee environment. Mitigation: multi-sig emergency controls, Arbitrum One as designated fallback, architecture designed for EVM portability with minimal migration effort. Storage on IPFS/Arweave is independent of any single chain.
 
-### 6.2 Smart Contracts
+**Smart Contract Risk** — Treasury.sol, ShotMarket.sol, and ClipNFT.sol handle real economic value. Mitigation: two independent audits (OpenZeppelin, Trail of Bits) before mainnet; TransparentProxy for bug fixes in Phase 1; checks-effects-interactions pattern and ReentrancyGuard throughout; 3-of-5 multi-sig emergency pause.
 
-#### Target Chain: Base (Coinbase L2)
+**AI Generation Cost Volatility** — API costs for AI video generation fluctuate as providers update pricing. Mitigation: platform supports local generation (ComfyUI, Stable Diffusion Video) with no API dependency; negotiate subsidized access with Runway, Pika, Kling for platform creators; compute credit system funded by Film Ticket NFT sales in Phase 3.
 
-OpenMontage will deploy on **Base**, Coinbase's Ethereum L2 rollup, as the primary chain. Rationale:
+### 9.2 Legal and Regulatory Risks
 
-- **Low fees**: Sub-cent transaction costs make frequent minting and backing economically viable for creators
-- **Creator ecosystem**: Base has cultivated the largest on-chain creator community (Zora, Friend.tech), aligning with OpenMontage's target users
-- **Coinbase onramp**: Seamless fiat-to-crypto for non-crypto-native filmmakers and audiences
-- **Ethereum security**: Inherits Ethereum's security guarantees as an OP Stack rollup
-- **EVM compatibility**: Standard Solidity tooling (Hardhat, Foundry, OpenZeppelin)
+**AI Content Copyright** — The legal status of AI-generated content varies across jurisdictions and continues to evolve. AI-assisted works may face challenges in claiming copyright in some markets. Mitigation: contributor attestation system requiring creators to assert originality and legal compliance; DMCA takedown procedures; IP attorney partnerships specializing in AI-generated content; on-chain provenance trail provides stronger attribution than traditional filmmaking.
 
-**Fallback**: Arbitrum One serves as the secondary deployment target if Base throughput or ecosystem conditions change. Base uses OP Stack and Arbitrum uses Nitro, but both are EVM-compatible rollups, so contract migration requires minimal changes.
+**Revenue NFT Securities Classification** — Clip NFTs and Film NFTs with revenue rights may be characterized as securities in certain jurisdictions, particularly the United States. Mitigation: legal review of token structure before TGE; modeled on lessons from Royal.io’s regulatory navigation; platform fee and governance token structure designed with regulatory considerations in mind; jurisdictional access controls as needed.
 
-#### Core Contracts
+**Standard Library IP** — Character LoRA models trained on reference images may incorporate IP that third parties claim. Mitigation: director attestation of training data rights; DMCA process; automated content fingerprinting for known IP.
 
-1. **ClipNFT.sol** — ERC-721 for segment ownership, includes backer registry
-2. **FilmNFT.sol** — Film copyright + revenue rights + Film Creation Bond management
-3. **Treasury.sol** — Automated revenue distribution (75/10/5/10 split), Competition Tax collection
-4. **ShotMarket.sol** — Shot Market: submission, backing, commit-reveal, resolution, payouts
-5. **StandardLibrary.sol** — Dependency versioning & compliance checks
+### 9.3 Market and Adoption Risks
 
-#### Contract Interfaces
+**Chicken-and-Egg Cold Start** — No films without creators; no creators without films. Mitigation: Pilot Film “Genesis” produced with 50 invite-only creators in Phase 1, generating showcase content and a community nucleus before public launch. Phase 1 contributors receive $MONTAGE test token airdrops creating early loyalty.
 
-```solidity
-// ─── ClipNFT.sol ─────────────────────────────────────────────────────────
-function submitClip(uint filmId, uint shotId, string videoHash) external returns (uint clipId);
-function mergeClip(uint shotId, uint clipId) external;
-function archiveClip(uint clipId) external;
+**Quality Dilution at Scale** — As the platform opens publicly, submission quality variance increases. Mitigation: automated quality floors (resolution, format, Standard Library compliance validation) filter non-compliant submissions before they reach menu auctions; quadratic weighting on valuations ensures broad community consensus outweighs concentrated capital; directors can set minimum quality thresholds per film.
 
-event ClipSubmitted(uint indexed filmId, uint indexed shotId, uint clipId, address creator);
-event ClipMerged(uint indexed shotId, uint clipId, uint previousClipId);
-event ClipArchived(uint indexed clipId);
-
-modifier onlyStandardLibraryCompliant(uint filmId, bytes32 contentHash);
-
-// ─── ShotMarket.sol ────────────────────────────────────────────────────────────────
-function openMarket(uint filmId, uint shotId, uint duration) external;
-function commitBacking(uint shotId, uint clipId, bytes32 commitment) external payable;
-function revealBacking(uint shotId, uint clipId, uint amount, bytes32 salt) external;
-function resolveMarket(uint shotId) external returns (uint winningClipId);
-function claimWinnerReward(uint shotId, address backer) external returns (uint amount);
-function claimLoserRefund(uint shotId, uint clipId, address backer) external returns (uint amount);
-
-event MarketOpened(uint indexed filmId, uint indexed shotId, uint commitDeadline, uint revealDeadline);
-event BackingCommitted(uint indexed shotId, uint indexed clipId, address indexed backer, bytes32 commitment);
-event BackingRevealed(uint indexed shotId, uint indexed clipId, address indexed backer, uint amount);
-event MarketResolved(uint indexed shotId, uint winningClipId, uint totalStaked, uint competitionTax);
-
-// ─── FilmNFT.sol ────────────────────────────────────────────────────────────────────
-function createFilm(string title, uint bondAmount) external returns (uint filmId);
-function getBondStatus(uint filmId) external view returns (uint bonded, uint refundable, bool completed);
-function claimBondRefund(uint filmId) external returns (uint refunded);
-
-event FilmCreated(uint indexed filmId, address director, uint bond, uint totalShots);
-event FilmCompleted(uint indexed filmId, uint mergedShots);
-event FilmAbandoned(uint indexed filmId, uint escrowDistributed);
-
-// ─── Treasury.sol ────────────────────────────────────────────────────────
-// Revenue split: 75% creators, 10% Film NFT holder, 5% stdlib, 10% backers
-function distributeRevenue(uint filmId) external;
-function claimRevenue(uint filmId) external returns (uint amount);
-function depositCompetitionTax(uint filmId, uint amount) external;
-function getClaimable(uint filmId, address participant) external view returns (uint creatorRevenue, uint backerRevenue, uint directorRevenue);
-```
-
-### 6.3 Standard Library Distribution
-
-**Infrastructure**:
-- Cloud CDN (Cloudflare, AWS CloudFront) for global distribution
-- Git LFS for large LoRA/ControlNet files
-- Versioning system (SemVer: v1.2.3)
-- Dependency manifest:
-```json
-{
-  "standard_library_version": "1.2.0",
-  "characters": [
-    {"name": "protagonist", "lora_hash": "QmXyZ...", "size_mb": 142}
-  ],
-  "style_guide_hash": "QmAbc...",
-  "prompt_templates": "..."
-}
-```
-
-**Validation**:
-- Automated checks verify submissions use correct versions
-- AI-powered similarity scoring (face recognition, style matching)
-- Reject submissions with <70% consistency score
-
-### 6.4 Real-Time Assembly Engine
-
-**Playback Process**:
-1. Frontend fetches `film.json` (segment order + Clip NFT pointers)
-2. For each shot, query ShotMarket.sol for current Main Branch Clip NFT
-3. Fetch video file from IPFS/CDN via video hash
-4. Stream segments sequentially with fade transitions
-5. Display creator attribution overlay
-
-**Optimization**:
-- Pre-cache popular films
-- Adaptive bitrate streaming (HLS/DASH)
-- Regional CDN edge caching
-
-### 6.5 Discord-First Platform Strategy
-
-Rather than building a full web application from day one, OpenMontage launches **Discord-first** — using Discord as the primary user interface for Phase 1, then progressively migrating to a standalone web app.
-
-#### Why Discord First
-
-Discord is where creator and crypto-native communities already live. By meeting users where they are, OpenMontage eliminates onboarding friction, leverages Discord's built-in identity/roles/moderation, and can ship a usable product in weeks rather than months. A custom web frontend is expensive and risky before product-market fit is validated.
-
-#### Architecture
-
-```
-┌──────────────┐     ┌──────────────────┐     ┌─────────────────┐     ┌──────────────┐
-│   Discord    │────▶│  Bot Backend     │────▶│  Web3 Provider  │────▶│   Smart      │
-│   (User UI)  │◄────│  (Node.js API)   │◄────│  (ethers.js)    │◄────│   Contracts  │
-└──────────────┘     └──────────────────┘     └─────────────────┘     │   (Base L2)  │
-                              │                                        └──────────────┘
-                              ▼
-                     ┌──────────────────┐
-                     │  IPFS / Arweave  │
-                     │  (Video Storage) │
-                     └──────────────────┘
-```
-
-The Discord bot translates user actions into blockchain transactions:
-- `/submit <shot-id>` → uploads video to IPFS, calls `ClipNFT.submitClip()`
-- `/back-clip <shot-id> <clip-id> <amount>` — commits backing to IPFS hash, calls `ShotMarket.commitBacking()`
-- `/claim` → calls `Treasury.claimRevenue()` for the user's merged clips
-- `/library <film-id>` → fetches Standard Library download links from CDN
-- `/status <film-id>` → displays film progress, open shots, active markets
-
-Users link their wallet once via `/connect-wallet` and all subsequent commands are signed through a custodial relay or WalletConnect session.
-
-#### Transition Path
-
-| Phase | Interface | Notes |
-|-------|-----------|-------|
-| **Phase 1** (Q2-Q3 2026) | Discord-only | Bot handles all workflows; testnet deployment |
-| **Phase 2** (Q4 2026) | Discord + Web Dashboard | Read-only dashboard for browsing films, viewing stats; Discord remains primary for actions |
-| **Phase 3** (2027+) | Full Web App + Discord notifications | Standalone web app for all workflows; Discord bot transitions to notification/alert role |
-
-This incremental approach validates the core product loop (submit → back → earn) cheaply before investing in custom frontend infrastructure.
-
-### 6.6 Security Considerations
-
-#### Smart Contract Auditing
-
-All core contracts (ClipNFT, FilmNFT, Treasury, ShotMarket, StandardLibrary) will undergo two independent audits before mainnet deployment:
-
-1. **OpenZeppelin** — industry-standard audit for ERC-721 compliance, access control, and upgrade patterns
-2. **Trail of Bits** — adversarial review focused on economic exploits, MEV risks, and governance attacks
-
-Audit reports will be published publicly. Critical findings must be resolved before deployment; medium-severity findings tracked in a public issue tracker with remediation timeline.
-
-#### Reentrancy Protection
-
-Treasury.sol is the highest-risk contract due to direct ETH/ERC-20 transfers. All payout functions implement the **checks-effects-interactions** pattern:
-
-1. Validate caller eligibility and compute amounts (checks)
-2. Update internal accounting and mark claims as processed (effects)
-3. Transfer funds last (interactions)
-
-Additionally, all external-facing functions in Treasury.sol use OpenZeppelin's `ReentrancyGuard` as defense-in-depth.
-
-#### Oracle and Price Feed Risks
-
-Revenue attribution for pay-per-view and advertising requires off-chain data. The platform uses **Chainlink Data Feeds** for ETH/USD price conversion and a custom Chainlink Functions integration for revenue event reporting. Oracle failure is mitigated by a 24-hour staleness check — if price data is stale, revenue distribution pauses until fresh data arrives.
-
-#### Upgrade Strategy
-
-Phase 1 contracts deploy behind **OpenZeppelin TransparentProxy** to allow bug fixes during early operation. Proxy admin is the team multi-sig (see below). After the protocol stabilizes (Phase 3), governance can vote to either:
-- Lock proxies permanently (immutable)
-- Migrate to new immutable contracts with a 30-day migration window
-
-#### Emergency Pause
-
-All core contracts inherit OpenZeppelin's `Pausable`. The team multi-sig can pause any contract in response to exploits or critical bugs. Pause authority transfers to the DAO Governor contract in Phase 3.
-
-#### Key Management
-
-Phase 1 operations are controlled by a **3-of-5 Gnosis Safe multi-sig** composed of founding team members. Signers are geographically distributed and use hardware wallets. The multi-sig controls: contract upgrades, emergency pause, treasury parameter changes, and initial governance settings.
+**$MONTAGE Token Volatility** — If the governance token experiences significant price volatility, it could distort platform incentives. Mitigation: creator earnings are denominated in USDC from film revenue, not in $MONTAGE; $MONTAGE governs the platform, not clip selection (menu auctions use USDC); vesting schedules prevent early selling pressure (only 8% circulating at TGE); buyback-and-burn creates structural demand.
 
 ---
 
-## 7. Roadmap
+## 10. Roadmap Overview
 
-### Phase 1: Foundation (Q2-Q3 2026)
-- ✅ Whitepaper & documentation
-- ⏳ Core smart contracts (testnet)
-- ⏳ Discord bot (MontageBot v0.1)
-- ⏳ Standard Library spec v1.0
-- ⏳ Pilot film project (community test)
+### Phase 1: Foundation (Q2–Q3 2026)
+
+**Theme: Build the foundation, prove the concept.**
+
+- Deploy core smart contracts on Base testnet: `ClipNFT.sol`, `FilmNFT.sol`, `Treasury.sol`, `ShotMarket.sol`
+- Launch Discord server and MontageBot v0.1 with core commands: `/claim-shot`, `/submit`, `/back-shot`, `/back-shot-menu`, `/reveal-backing`, `/claim-market`
+- Publish Standard Library Specification v1.0 (required asset formats, SemVer versioning, compliance criteria)
+- Launch Pilot Film “Genesis”: 20-minute sci-fi short, 100 shots, 50 invite-only creators
+- Complete security audit; address all critical findings
+- Target: 5,000 Discord members, 80% of pilot shots filled, net-positive creator sentiment
 
 ### Phase 2: Alpha Launch (Q4 2026)
-- Mainnet deployment on Base (Coinbase L2)
-- Public film repository platform
-- Shot Market competition tools
-- Film Ticket NFT crowdfunding
+
+**Theme: Open the floodgates.**
+
+- Deploy all contracts to Base mainnet with gas optimization and subgraph indexing
+- Launch Web Dashboard v1: film browsing, submission management, revenue tracking, creator profiles
+- Remove invite gate — any creator can submit, any director can create films (minimum Film Creation Bond: 500 USDC)
+- Launch Film Ticket NFT crowdfunding for three inaugural public films
+- Target: 20,000 community members, 10 active film projects, $50,000+ in Film Ticket NFT sales
 
 ### Phase 3: Ecosystem Growth (2027)
-- $MONTAGE governance token launch
-- Advanced Standard Library tools (auto LoRA training)
-- Cross-film asset marketplace
-- AI-powered consistency validation
-- DeFi integration (Clip NFT collateralized loans)
-- Mobile apps (iOS/Android)
 
-### Phase 4: Mass Adoption (2028+)
-- Partnerships with film festivals
-- Studio licensing deals
-- Educational institution integrations
-- Localization (50+ languages)
-- VR/AR immersive viewing experiences
+**Theme: Build the economy.**
 
----
+- $MONTAGE TGE (Q1 2027) via IDO on Base-native DEX; initial circulating supply ~8%
+- Full DAO governance activation — binding on-chain votes via Governor contract
+- Advanced Standard Library tools: one-click LoRA training, style transfer templates, AI consistency scoring
+- Creator marketplace for secondary Clip NFT trading (10% perpetual creator royalty on resales)
+- Cross-film Standard Library marketplace — license assets across film projects
+- DeFi integrations: Clip NFT collateral for loans, $MONTAGE staking vaults
+- Mobile apps (iOS and Android)
+- Submit top community films to independent film festivals
+- Target: 50,000+ community members, 100+ active films, $1M+ total creator earnings distributed
 
-## 8. Use Cases
+### Phase 4: Scale and Legitimacy (2028+)
 
-### 8.1 Indie AI Films
-Global creators collaborate on original screenplays, earning revenue from successful projects.
+**Theme: Mainstream adoption and institutional credibility.**
 
-### 8.2 Fan Films
-Community-driven adaptations of public domain works (Shakespeare, mythology) with guaranteed visual consistency.
+- Festival partnerships and dedicated OpenMontage award categories
+- Studio licensing framework for distributing community-created films
+- VR/AR immersive viewing (Meta Quest, Apple Vision Pro)
+- Platform UI localization in 25+ languages with regional community infrastructure
+- Film school curriculum integrations (USC, NYU, AFI, international equivalents)
+- Revenue sustainability target: platform self-funding from fees by end of 2028
+- Long-term vision: 50,000+ active creators, 500+ completed films, $10M+ annual creator earnings
 
-### 8.3 Educational Content
-Universities/edtech platforms crowdsource science explainer videos segment-by-segment.
+**Key milestones timeline:**
 
-### 8.4 Music Videos
-Musicians crowdfund visuals via Film Ticket NFTs, contributors compete for 75% revenue share.
-
-### 8.5 Corporate Videos
-Brands outsource production to global talent marketplace, paying only for final merged segments.
-
----
-
-## 9. Competitive Analysis
-
-> For a comprehensive competitive landscape analysis, see [Competitive Analysis](competitive-analysis.md).
-
-| Platform | Model | Consistency Solution | Revenue Model | Iteration |
-|----------|-------|---------------------|---------------|-----------|
-| **OpenMontage** | Decentralized Git | Mandatory Standard Library | 75% streaming revenue | Segments replaceable |
-| Traditional Studios | Centralized | Single production designer | Upfront fees | Fixed after release |
-| YouTube Collaborations | Ad-hoc | Manual style guides (often ignored) | Ad revenue (platform takes 45%) | No formal replacement |
-| Decentralized Social (Lens, Farcaster) | Creator-owned | None | Tips/subscriptions | No quality curation |
-
-**Key Differentiators**:
-1. **Only platform with mandatory dependency system** for AI-generated content
-2. **Only streaming revenue model** proportional to screen time
-3. **Only version-controlled films** that improve over time
-
----
-
-## 10. Risk Mitigation
-
-### 10.1 Technical Risks
-
-**Storage Costs**  
-- Mitigation: IPFS/Arweave for permanent storage, CDN for delivery
-- Contributors cover initial upload costs (offset by revenue potential)
-
-**Blockchain Fees**
-- Mitigation: Deploy on Base (Coinbase L2) for sub-cent transaction costs, with Arbitrum as fallback
-
-### 10.2 Legal Risks
-
-**Copyright Infringement**  
-- Mitigation: DMCA takedown process, contributor identity verification
-- Smart contracts include copyright attestation requirement
-
-**Revenue Distribution Disputes**  
-- Mitigation: All payments on-chain and auditable, transparent Shot Market records
-
-### 10.3 Market Risks
-
-**Low Adoption**  
-- Mitigation: Partner with film schools, AI tool providers (Runway, Pika)
-- Incentivize early adopters with bonus token distributions
-
-**Poor Quality Content**  
-- Mitigation: Quality floors via automated checks, economic skin-in-the-game (quadratic backing)
+| Milestone | Target Date |
+|-----------|-------------|
+| Documentation complete | Q1 2026 (done) |
+| Testnet smart contracts | Q2 2026 |
+| MontageBot v0.1 | Q2 2026 |
+| Pilot film “Genesis” kickoff | Q2 2026 |
+| Pilot film complete | Q3 2026 |
+| Security audit complete | Q3 2026 |
+| Base mainnet deployment | Q4 2026 |
+| Web Dashboard v1 | Q4 2026 |
+| $MONTAGE TGE | Q1 2027 |
+| Full DAO governance | Q2 2027 |
+| Mobile app beta | Q3 2027 |
 
 ---
 
 ## 11. Conclusion
 
-OpenMontage transforms filmmaking from a centralized, capital-intensive industry into a **decentralized, meritocratic marketplace**. By solving the three fundamental barriers — consistency, incentives, and quality — through Standard Library dependencies, NFT-based economics, and version control, we enable:
+OpenMontage is the infrastructure layer that makes professional crowdsourced AI filmmaking economically viable. It solves the three structural barriers that have prevented collaborative AI film production — consistency, incentives, and quality — through a coherent system of four integrated innovations: the Standard Library, the Pull Request workflow, Shot Market Menu Auctions, and NFT-driven economics.
 
-1. **Global collaboration** on professional-quality films
-2. **Fair compensation** for creators based on merit, not connections
-3. **Continuous improvement** as technology and talent evolve
-4. **Transparent economics** via blockchain-based revenue distribution
+The platform’s economic design aligns incentives across every participant category. Directors invest in quality Standard Libraries because better infrastructure attracts better contributors and generates larger revenue streams. Creators invest effort in quality submissions because winning returns capital and generates passive income. Backers submit honest valuation menus because truthful preference revelation is the dominant strategy in the menu auction’s equilibrium. Audiences drive the entire engine through engagement, making every participant’s incentives point toward film quality.
 
-**This is not just open-source filmmaking — it's the infrastructure for the next generation of cinema in the age of AI.**
+Shot Market Menu Auctions represent the platform’s most distinctive innovation. Adapted from the Bernheim-Whinston (1986) menu auction framework and enhanced with quadratic weighting, they let backers express preferences across ALL competing clips for each shot via sealed valuation menus. The clip with the highest aggregate quadratic-weighted community valuation wins — producing efficient outcomes under the quadratic-weighted objective. By eliminating the “backing a loser” penalty and encouraging full preference revelation, the mechanism creates the first genuinely efficient creative curation system. Films improve over time as AI technology advances and new creators submit superior versions of existing shots. Earnings are continuous, transparent, and proportional to contribution — enforced by smart contracts, not by platform administrators.
 
----
+This is not simply a new way to fund films, or a new NFT marketplace, or another AI video tool. It is a new model for how creative works are produced, curated, owned, and monetized in the age of AI — one in which the traditional trade-off between creative control and collaborative scale no longer applies.
 
-**Join us in building the future of collaborative storytelling.**
-
-- **Website**: [openmontage.com](https://openmontage.com)
-- **GitHub**: [github.com/digimads-lab/OpenMontage](https://github.com/digimads-lab/OpenMontage)
-- **Discord**: [discord.gg/openmontage](https://discord.gg/openmontage)
-- **Twitter**: [@OpenMontage](https://twitter.com/openmontage)
+**The future of cinema is collaborative, iterative, and decentralized. OpenMontage is building its infrastructure.**
 
 ---
 
-**Version**: 1.2
-**Last Updated**: 2026-03-04
+**Website**: [openmontage.com](https://openmontage.com)
+**GitHub**: [github.com/digimads-lab/OpenMontage](https://github.com/digimads-lab/OpenMontage)
+**Discord**: [discord.gg/SS8BdjYH6W](https://discord.gg/SS8BdjYH6W)
+**Twitter**: [@OpenMontage](https://twitter.com/openmontage)
+
+---
+
+**Version**: 3.0
+**Last Updated**: 2026-03-05
 **Authors**: OpenMontage Core Team
